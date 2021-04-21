@@ -1,6 +1,6 @@
-package DestinationAirport;
+package SharedRegions;
 
-public class DestinationAirport implements IDestinationAirport_Pilot, IDestinationAirport_Passenger
+public class DestinationAirport
 {
     public DestinationAirport()
     {
@@ -9,14 +9,14 @@ public class DestinationAirport implements IDestinationAirport_Pilot, IDestinati
 
     //----------------------------------------
     // Passageiro
-    @Override
+
     public void leaveThePlane() {
 
     }
 
     //----------------------------------------
     // Piloto
-    @Override
+
     public void announceArrival() {
 
     }

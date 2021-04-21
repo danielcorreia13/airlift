@@ -1,18 +1,19 @@
 package ActiveEntity;
 
-import DepartureAirport.IDepartureAirport_Hostess;
-import Plane.IPlane_Hostess;
+import SharedRegions.*;
+import lib.*;
+import Main.*;
 
 public class Hostess extends Thread
 {
     // Para os métodos que só a Hospedeira tem acesso nas zonas partilhadas.
-    private final IDepartureAirport_Hostess iDepartureAirport;
-    private final Plane.IPlane_Hostess iPlane;
+    private final DepartureAirport depAir;
+    private final Plane plane;
 
-    public Hostess(IDepartureAirport_Hostess iDepartureAirport, IPlane_Hostess iPlane)
-    {
-        this.iDepartureAirport = iDepartureAirport;
-        this.iPlane = iPlane;
+    public Hostess(String name, DepartureAirport depAir, Plane plane) {
+        super(name);
+        this.depAir = depAir;
+        this.plane = plane;
     }
 
     //Vida do Thread (Hospedeira)
@@ -23,7 +24,7 @@ public class Hostess extends Thread
         while(notEnd)
         {
             // Exemplo: Hospedeira avisa ao piloto que os passageiros estão todos no avião
-            iPlane.informPlaneReadyToTakeOff();
+            plane.informPlaneReadyToTakeOff();
         }
     }
 }

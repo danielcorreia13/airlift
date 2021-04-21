@@ -1,22 +1,22 @@
 package ActiveEntity;
 
-import DepartureAirport.IDepartureAirport_Pilot;
-import DestinationAirport.IDestinationAirport_Pilot;
-import Plane.IPlane_Pilot;
+import SharedRegions.*;
+import lib.*;
+import Main.*;
 
-public class Pilot
+public class Pilot extends Thread
 {
     // Para os métodos que só o Piloto tem acesso nas zonas partilhadas.
-    private final IDepartureAirport_Pilot iDepartureAirport;
-    private final IDestinationAirport_Pilot iDestinationAirport;
-    private final Plane.IPlane_Pilot iPlane;
+    private final DepartureAirport depAir;
+    private final DestinationAirport destAir;
+    private final Plane plane;
 
-    public Pilot(IDepartureAirport_Pilot iDepartureAirport, IDestinationAirport_Pilot iDestinationAirport, IPlane_Pilot iPlane) {
-        this.iDepartureAirport = iDepartureAirport;
-        this.iDestinationAirport = iDestinationAirport;
-        this.iPlane = iPlane;
+    public Pilot(String name, DepartureAirport depAir, DestinationAirport destAir, Plane plane) {
+        super(name);
+        this.depAir = depAir;
+        this.destAir = destAir;
+        this.plane = plane;
     }
-
 
     // Vida do Thread (Piloto)
     public void run()
@@ -26,13 +26,13 @@ public class Pilot
         while(notEnd)
         {
             // Exemplo na zona partilhada Avião: Piloto espera todos os passageiro a bordo
-            iPlane.waitForAllInBoard();
+            plane.waitForAllInBoard();
 
             // Exemplo na zona partilhada Aeroporto Destino: Piloto avisa aos Passageiros da chegada
-            iDestinationAirport.announceArrival();
+            destAir.announceArrival();
 
             // Exemplo na zona partilhada Aeroporto Partida: Piloto informa à hospedeira que o avião está pronto
-            iDepartureAirport.informPlaneReadyForBoarding();
+            depAir.informPlaneReadyForBoarding();
         }
     }
 }

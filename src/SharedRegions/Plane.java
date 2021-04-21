@@ -1,10 +1,17 @@
-package Plane;
+package SharedRegions;
 
-public class Plane implements IPlane_Hostess, IPlane_Pilot, IPlane_Passenger
+public class Plane
 {
+
+    private int state; //0 - dep / 1 - flight / 2 - dest
+
+    public Plane() {
+        state = 0;
+    }
+
     //----------------------------------------
     // Hostess
-    @Override
+
     public void informPlaneReadyToTakeOff() {
 
     }
@@ -12,29 +19,27 @@ public class Plane implements IPlane_Hostess, IPlane_Pilot, IPlane_Passenger
 
     //----------------------------------------
     // Passenger
-    @Override
+
     public void boardThePlane() {
 
     }
 
-    @Override
+
     public void waitForEndOfFlight() {
 
     }
 
     //----------------------------------------
     // Pilot
-    @Override
+
     public void waitForAllInBoard() {
 
     }
 
-    @Override
     public void flyToDestinationPoint() {
 
     }
 
-    @Override
     public void flyToDeparturePoint() {
 
     }
