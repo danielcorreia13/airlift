@@ -15,6 +15,8 @@ public class DepartureAirport
 
     private boolean readyForBoardig;
 
+    private final GeneralRep generalRep;
+
     /**
      *  Departure Airport instantiation.
      *
@@ -23,6 +25,7 @@ public class DepartureAirport
 
     public DepartureAirport(GeneralRep repos)
     {
+        generalRep = repos;
         try{
             passengerQueue = new MemFIFO<>(new Integer [Settings.nPassengers]);
         }catch (MemException e){

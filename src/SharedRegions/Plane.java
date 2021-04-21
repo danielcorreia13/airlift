@@ -5,7 +5,16 @@ public class Plane
 
     private int state; //0 - dep / 1 - flight / 2 - dest
 
-    public Plane() {
+    private final GeneralRep generalRep;
+
+    /**
+     *  Plane instantiation.
+     *
+     *    @param repos reference to the general repository
+     */
+
+    public Plane(GeneralRep repos) {
+        generalRep = repos;
         state = 0;
     }
 
