@@ -4,6 +4,7 @@ import ActiveEntity.*;
 import lib.*;
 import Main.*;
 
+import javax.swing.plaf.TableHeaderUI;
 import java.util.Arrays;
 
 public class DepartureAirport
@@ -44,47 +45,110 @@ public class DepartureAirport
     //----------------------------------------
     // Hostess
 
-    public void prepareForPassBoarding() {
 
+
+
+    public synchronized void checkDocuments() {
+        System.out.println("Check doc");
+        int passId = -1;
+        try {
+            passId = passengerQueue.read();
+        }catch (MemException e){
+            System.err.println("Retrieval of passenger from waiting queue failed: " + e.getMessage());
+            System.exit(1);
+        }
+        passengers[passId].setShowDocuments(true);
+        notifyAll();
+        ((Hostess) Thread.currentThread()).sethState(Hostess.States.CHECK_PASSENGER);
+        while (passengers[passId].getShowDocuments()){
+            try{
+                wait();
+            }catch (InterruptedException e){}
+        }
+
+        passengers[passId].setpState(Passenger.States.IN_FLIGHT);
+        notify();
     }
 
 
-    public void checkDocuments() {
+    public synchronized void waitForNextPassenger() {
+        System.out.println("wait for next pass");
+        ((Hostess) Thread.currentThread()).sethState(Hostess.States.WAIT_FOR_PASSENGER);
+        while (passengerQueue.empty()) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
 
+            }
+        }
     }
 
 
-    public void waitForNextPassenger() {
-
-    }
-
-
-    public void waitForNextFlight() {
-
+    public synchronized void waitForNextFlight() {
+        System.out.println("Wait for next flight");
+        while (!readyForBoardig) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+            }
+        }
     }
 
     //----------------------------------------
     // Passenger
 
 
-    public void waitInQueue() {
+    public synchronized void waitInQueue() {
+        int passId = ((Passenger) Thread.currentThread()).getpId();
+        passengers[passId] = (Passenger) Thread.currentThread();
+        passengers[passId].setpState(Passenger.States.IN_QUEUE);
+        System.out.println("Passenger " + passId + " arrived at airport");
+        //TODO: repository
 
+        try{
+            passengerQueue.write(passId);
+        }catch (MemException e){
+            System.err.println("Insertion of passenger in waiting queue failed: " + e.getMessage());
+            System.exit(1);
+        }
+        notify();
+
+        while (!((Passenger) Thread.currentThread()).getShowDocuments()){
+            try{
+                wait();
+            }catch (InterruptedException e){
+
+            }
+        }
+
+        showDocuments();
+
+        while (((Passenger) Thread.currentThread()).getpState() != Passenger.States.IN_FLIGHT){
+            try{
+                wait();
+            }catch (InterruptedException e){
+
+            }
+        }
+        System.out.println("Passenger " + passId + " in flight");
     }
 
 
-    public void showDocuments() {
-
+    public synchronized void showDocuments() {
+        ((Passenger)Thread.currentThread()).setShowDocuments(false);
+        System.out.println("Show documents");
+        notify();
     }
 
     //----------------------------------------
     // Pilot
 
-    public void parkAtTransferGate() {
-
-    }
 
 
-    public void informPlaneReadyForBoarding() {
 
+    public synchronized void informPlaneReadyForBoarding() {
+        readyForBoardig = true;
+        System.out.println("Ready for boarding");
+        notifyAll();
     }
 }

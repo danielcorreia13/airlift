@@ -27,6 +27,17 @@ public class Passenger extends Thread
 
     private final DestinationAirport destAir;
 
+    public int getpState() {
+        return pState;
+    }
+    public void setpState(int state){
+        pState = state;
+    }
+
+    public int getpId() {
+        return pId;
+    }
+
     /**
      *  Reference to Plane
      */
@@ -37,13 +48,27 @@ public class Passenger extends Thread
      *  Passenger state
      */
 
-    private final int state;
+    private int pState;
+
+    public boolean getShowDocuments() {
+        return showDocuments;
+    }
+
+    public void setShowDocuments(boolean showDocuments) {
+        this.showDocuments = showDocuments;
+    }
+
+    /**
+     * Show documents flag
+     */
+
+    private boolean showDocuments;
 
     /**
      *  Passenger identification
      */
 
-    private final int id;
+    private final int pId;
 
 
     /**
@@ -62,8 +87,9 @@ public class Passenger extends Thread
         this.depAir = depAir;
         this.destAir = destAir;
         this.plane = plane;
-        this.state = States.GOING_TO_AIRPORT;
-        this.id = id;
+        this.pState = States.GOING_TO_AIRPORT;
+        this.pId = id;
+        this.showDocuments = false;
     }
 
     /**
@@ -75,18 +101,17 @@ public class Passenger extends Thread
     {
         Boolean notEnd = true;
 
-        while(notEnd)
-        {
-            // Exemplo na zona partilhada Avião: Passageiro espera o voo terminar
-            plane.waitForEndOfFlight();
+        travelToAirport();
 
-            // Exemplo na zona partilhada Aeroporto Destino: Passageiro avisa que saiu do avião
-            destAir.leaveThePlane();
-        }
+        depAir.waitInQueue();
+
     }
 
     public void travelToAirport() {
-
+        try
+        { sleep ((long) (1 + 10 * Math.random ()));
+        }
+        catch (InterruptedException e) {}
     }
 
     /**

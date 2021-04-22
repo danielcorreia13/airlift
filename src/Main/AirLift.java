@@ -19,16 +19,9 @@ public class AirLift
 	private final Pilot pilot;
 	private final Passenger[] passenger;
 
-	// Configura��o
-	private final Integer TTL_PASSENGER;
-	private final Integer MAX_PASSENGER;
-	private final Integer MIN_PASSENGER;
 	
 	public AirLift( String args[] )
 	{
-		TTL_PASSENGER = 21; // Passageiros que participam na simula��o
-		MAX_PASSENGER = 10; // Capacidade m�xima do avi�o
-		MIN_PASSENGER = 5; // Capacidade m�nima do avi�o
 		
 		// Instanciar as regi�es partilhadas
 		generalRep = new GeneralRep();
@@ -41,9 +34,9 @@ public class AirLift
 		hostess = new Hostess( "Hostess1", sharedDepartureAirport, sharedPlane /* Passar mais argumentos*/);
 		
 			// Como existem v�rios passageiros
-		passenger = new Passenger[TTL_PASSENGER];
+		passenger = new Passenger[Settings.nPassengers];
 		
-		for (int i = 0; i < MAX_PASSENGER; i++)
+		for (int i = 0; i < Settings.nPassengers; i++)
 		{
 			passenger[i] = new Passenger( "Passenger"+i,i, sharedDepartureAirport, sharedDestinationAirport, sharedPlane /* Passar mais argumentos*/);
 		}
@@ -55,10 +48,25 @@ public class AirLift
 	{
 		System.out.println("Simula��o iniciada");
 		
-		// Iniciar os threads
+		pilot.start();
+		hostess.start();
+		for (Passenger p : passenger){
+			p.start();
+		}
+
 		
 		
 		// Esperar que os threads morram
+		try {
+			pilot.join();
+			hostess.join();
+			for (Passenger p : passenger) {
+				p.join();
+			}
+		}catch (InterruptedException e){
+			System.out.println("Morreuuuuu");
+		}
+
 	}
 	
 	

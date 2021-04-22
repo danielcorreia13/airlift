@@ -50,17 +50,19 @@ public class Pilot extends Thread
     {
         Boolean notEnd = true;
 
-        while(notEnd)
-        {
-            // Exemplo na zona partilhada Avião: Piloto espera todos os passageiro a bordo
-            plane.waitForAllInBoard();
 
-            // Exemplo na zona partilhada Aeroporto Destino: Piloto avisa aos Passageiros da chegada
-            destAir.announceArrival();
+        parkAtTransferGate();
 
-            // Exemplo na zona partilhada Aeroporto Partida: Piloto informa à hospedeira que o avião está pronto
-            depAir.informPlaneReadyForBoarding();
+        depAir.informPlaneReadyForBoarding();
+
+    }
+
+    public void parkAtTransferGate() {
+        try
+        { sleep ((long) (1 + 100 * Math.random ()));
         }
+        catch (InterruptedException e) {}
+        System.out.println("Park transfer gate");
     }
 
     /**

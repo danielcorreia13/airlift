@@ -27,29 +27,54 @@ public class Hostess extends Thread
 
     private final Plane plane;
 
+    public int gethState() {
+        return hState;
+    }
+
+    public void sethState(int hState) {
+        this.hState = hState;
+    }
+
     /**
      *  Hostess state
      */
 
-    private final int state;
+    private int hState;
 
     public Hostess(String name, DepartureAirport depAir, Plane plane) {
         super(name);
         this.depAir = depAir;
         this.plane = plane;
-        this.state = States.WAIT_FOR_NEXT_FLIGHT;
+        this.hState = States.WAIT_FOR_NEXT_FLIGHT;
     }
 
     //Vida do Thread (Hospedeira)
     public void run()
     {
         Boolean notEnd = true;
+        int count = 0;
 
-        while(notEnd)
-        {
-            // Exemplo: Hospedeira avisa ao piloto que os passageiros estão todos no avião
-            plane.informPlaneReadyToTakeOff();
+        depAir.waitForNextFlight();
+
+        prepareForPassBoarding();
+
+        while (count < 5){
+            count++;
+            depAir.waitForNextPassenger();
+            depAir.checkDocuments();
+
         }
+        System.out.println("Plane full");
+
+    }
+
+    public void prepareForPassBoarding() {
+        try
+        { sleep ((long) (1 + 10 * Math.random ()));
+        }
+        catch (InterruptedException e) {}
+        System.out.println("Prepare for pass board");
+        sethState(States.WAIT_FOR_PASSENGER);
     }
 
     /**
