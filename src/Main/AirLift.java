@@ -45,7 +45,7 @@ public class AirLift
 		
 		for (int i = 0; i < MAX_PASSENGER; i++)
 		{
-			passenger[i] = new Passenger( "Passenger"+i, sharedDepartureAirport, sharedDestinationAirport, sharedPlane /* Passar mais argumentos*/);
+			passenger[i] = new Passenger( "Passenger"+i,i, sharedDepartureAirport, sharedDestinationAirport, sharedPlane /* Passar mais argumentos*/);
 		}
 		
 	}

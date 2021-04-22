@@ -66,10 +66,6 @@ public class DepartureAirport
     //----------------------------------------
     // Passenger
 
-    public void travelToAirport() {
-
-    }
-
 
     public void waitInQueue() {
 
