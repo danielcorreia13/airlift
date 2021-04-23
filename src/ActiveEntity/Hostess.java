@@ -65,6 +65,8 @@ public class Hostess extends Thread
 
         }
         System.out.println("Plane full");
+        plane.informPlaneIsReadyToTakeOff();
+        
 
     }
 

@@ -16,53 +16,71 @@ public class Pilot extends Thread
     /**
      *  Reference to Departure Airport
      */
-
     private final DepartureAirport depAir;
 
     /**
      *  Reference to Destination Airport
      */
-
     private final DestinationAirport destAir;
 
     /**
      *  Reference to Plane
      */
-
     private final Plane plane;
 
     /**
      *  Pilot state
      */
+    private int pilotState;
 
-    private final int state;
-
+    
+    
     public Pilot(String name, DepartureAirport depAir, DestinationAirport destAir, Plane plane) {
         super(name);
         this.depAir = depAir;
         this.destAir = destAir;
         this.plane = plane;
-        this.state = States.AT_TRANSFER_GATE;
+        this.pilotState = States.AT_TRANSFER_GATE;
     }
+ 
+    
+    public int getPilotState()
+    {
+		return this.pilotState;
+	}
+    
+    public void setPilotState(int pState)
+    {
+		this.pilotState = pState;
+	}
+    
 
-    // Vida do Thread (Piloto)
+	// Vida do Thread (Piloto)
     public void run()
     {
         Boolean notEnd = true;
-
+        
 
         parkAtTransferGate();
-
         depAir.informPlaneReadyForBoarding();
+        plane.waitForAllInBoard();
+        plane.flyToDestinationPoint();
+        
 
     }
 
     public void parkAtTransferGate() {
+    	
         try
-        { sleep ((long) (1 + 100 * Math.random ()));
+        { 
+        	sleep ((long) (1 + 100 * Math.random ()));
         }
         catch (InterruptedException e) {}
-        System.out.println("Park transfer gate");
+        
+        this.pilotState = States.AT_TRANSFER_GATE;
+        System.out.println("PILOT: Park transfer gate");
+        
+        
     }
 
     /**

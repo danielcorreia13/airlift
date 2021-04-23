@@ -104,6 +104,9 @@ public class Passenger extends Thread
         travelToAirport();
 
         depAir.waitInQueue();
+        
+        boardThePlane();
+        
 
     }
 
@@ -112,6 +115,18 @@ public class Passenger extends Thread
         { sleep ((long) (1 + 10 * Math.random ()));
         }
         catch (InterruptedException e) {}
+    }
+    
+    public synchronized void boardThePlane() 
+    {
+    	int passId = ((Passenger) Thread.currentThread()).getpId();
+    	System.out.println("PASSENGER "+passId+ ": Boarding");  
+        try
+        { sleep ((long) (1 + 10 * Math.random ()));
+        }
+        catch (InterruptedException e) {}
+        
+        plane.waitForEndOfFlight();
     }
 
     /**

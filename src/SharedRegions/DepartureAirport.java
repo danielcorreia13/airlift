@@ -42,11 +42,9 @@ public class DepartureAirport
     }
 
 
-    //----------------------------------------
-    // Hostess
-
-
-
+    //--------------------------------------------------------------------------------
+    // HOSTESS
+    //--------------------------------------------------------------------------------
 
     public synchronized void checkDocuments() {
         System.out.println("Check doc");
@@ -58,8 +56,11 @@ public class DepartureAirport
             System.exit(1);
         }
         passengers[passId].setShowDocuments(true);
-        notifyAll();
+        
         ((Hostess) Thread.currentThread()).sethState(Hostess.States.CHECK_PASSENGER);
+        
+        notifyAll();
+        
         while (passengers[passId].getShowDocuments()){
             try{
                 wait();
@@ -74,6 +75,9 @@ public class DepartureAirport
     public synchronized void waitForNextPassenger() {
         System.out.println("wait for next pass");
         ((Hostess) Thread.currentThread()).sethState(Hostess.States.WAIT_FOR_PASSENGER);
+        
+        notifyAll();
+        
         while (passengerQueue.empty()) {
             try {
                 wait();
@@ -86,18 +90,18 @@ public class DepartureAirport
 
     public synchronized void waitForNextFlight() {
         System.out.println("Wait for next flight");
-        while (!readyForBoardig) {
+        while (!readyForBoardig) 
+        {
             try {
                 wait();
-            } catch (InterruptedException e) {
-            }
+            } catch (InterruptedException e) {}
         }
     }
+    
 
-    //----------------------------------------
-    // Passenger
-
-
+    //--------------------------------------------------------------------------------
+    // PASSENGER
+    //--------------------------------------------------------------------------------
     public synchronized void waitInQueue() {
         int passId = ((Passenger) Thread.currentThread()).getpId();
         passengers[passId] = (Passenger) Thread.currentThread();
@@ -130,7 +134,7 @@ public class DepartureAirport
 
             }
         }
-        System.out.println("Passenger " + passId + " in flight");
+        System.out.println("Passenger " + passId + " ready for board");
     }
 
 
@@ -139,16 +143,15 @@ public class DepartureAirport
         System.out.println("Show documents");
         notify();
     }
+    
 
-    //----------------------------------------
-    // Pilot
-
-
-
-
+    //--------------------------------------------------------------------------------
+    // PILOT
+    //--------------------------------------------------------------------------------
     public synchronized void informPlaneReadyForBoarding() {
         readyForBoardig = true;
-        System.out.println("Ready for boarding");
+        ((Pilot) Thread.currentThread()).setPilotState(Pilot.States.READY_FOR_BOARDING);
+        System.out.println("PILOT: Ready for boarding");
         notifyAll();
     }
 }
