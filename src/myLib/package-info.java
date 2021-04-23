@@ -2,4 +2,4 @@
  *   Common infrastructure.
  */
 
-package lib;
+package myLib;

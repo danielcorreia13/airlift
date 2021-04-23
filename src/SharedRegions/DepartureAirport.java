@@ -1,10 +1,9 @@
 package SharedRegions;
 
 import ActiveEntity.*;
-import lib.*;
+import myLib.*;
 import Main.*;
 
-import javax.swing.plaf.TableHeaderUI;
 import java.util.Arrays;
 
 public class DepartureAirport

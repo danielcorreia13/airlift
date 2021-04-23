@@ -4,10 +4,6 @@ import ActiveEntity.Hostess;
 import ActiveEntity.Passenger;
 import ActiveEntity.Pilot;
 
-import SharedRegions.*;
-import lib.*;
-import Main.*;
-
 public class Plane
 {
 	
@@ -18,6 +14,7 @@ public class Plane
 	private Pilot pilot;
     private final GeneralRep generalRep;
     private boolean allInBoard;
+    private int nPassengers;
 
     /**
      *  Plane instantiation.
@@ -28,6 +25,11 @@ public class Plane
     public Plane (GeneralRep repos) {
         generalRep = repos;
         //state = 0;
+        nPassengers = 0;
+    }
+
+    public int getNPassengers(){
+        return nPassengers;
     }
 
     //                                  HOSTESS                                      //
@@ -68,6 +70,7 @@ public class Plane
     	int  passId = ((Passenger) Thread.currentThread()).getpId();
     	System.out.println("PASSENGER "+ passId +": Waiting for the end of the flight");
     	((Passenger) Thread.currentThread()).setpState(Passenger.States.IN_FLIGHT);
+    	nPassengers++;
     }
 
     
@@ -86,6 +89,7 @@ public class Plane
     public synchronized void waitForAllInBoard() 
     {
     	System.out.println("PILOT: waiting for all passengers on board");
+        nPassengers = 0;
     	((Pilot) Thread.currentThread()).setPilotState(Pilot.States.WAIT_FOR_BOARDING);
     	try 
     	{
@@ -96,30 +100,7 @@ public class Plane
     	
     }
     
-    /**
-     *  Operation inform that the plane is going to the destination point
-     *
-     *  It is called by the PILOT while flying to destination point
-     *
-     *    @return void
-     */
 
-    public synchronized void flyToDestinationPoint() 
-    {
-    	System.out.println("PILOT: Flying to destination");
-    	((Pilot) Thread.currentThread()).setPilotState(Pilot.States.FLYING_FORWARD);
 
-    }
 
-    /**
-     *  Operation inform that the plane is ready for take off
-     *
-     *  It is called by the PILOT while flying to departure point
-     *
-     *    @return void
-     */
-    
-	public synchronized void flyToDeparturePoint() {
-
-    }
 }

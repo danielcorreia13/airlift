@@ -1,4 +1,4 @@
-package lib;
+package myLib;
 
 /**
  *    Parametric memory.

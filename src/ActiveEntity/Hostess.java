@@ -1,8 +1,6 @@
 package ActiveEntity;
 
 import SharedRegions.*;
-import lib.*;
-import Main.*;
 
 /**
  *   Passenger thread.

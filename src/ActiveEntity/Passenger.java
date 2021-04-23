@@ -1,8 +1,6 @@
 package ActiveEntity;
 
 import SharedRegions.*;
-import lib.*;
-import Main.*;
 
 /**
  *   Passenger thread.
@@ -105,8 +103,13 @@ public class Passenger extends Thread
 
         depAir.waitInQueue();
         
-        boardThePlane();
-        
+        //boardThePlane();
+
+        plane.waitForEndOfFlight();
+
+        destAir.leaveThePlane();
+
+
 
     }
 

@@ -1,8 +1,6 @@
 package ActiveEntity;
 
 import SharedRegions.*;
-import lib.*;
-import Main.*;
 
 /**
  *   Pilot thread.
@@ -64,8 +62,11 @@ public class Pilot extends Thread
         parkAtTransferGate();
         depAir.informPlaneReadyForBoarding();
         plane.waitForAllInBoard();
-        plane.flyToDestinationPoint();
-        
+        flyToDestinationPoint();
+
+        destAir.announceArrival(plane.getNPassengers());
+
+        flyToDeparturePoint();
 
     }
 
@@ -81,6 +82,43 @@ public class Pilot extends Thread
         System.out.println("PILOT: Park transfer gate");
         
         
+    }
+
+    /**
+     *  Operation inform that the plane is going to the destination point
+     *
+     *  It is called by the PILOT while flying to destination point
+     *
+     *    @return void
+     */
+
+    public synchronized void flyToDestinationPoint()
+    {
+        System.out.println("PILOT: Flying to destination");
+        ((Pilot) Thread.currentThread()).setPilotState(Pilot.States.FLYING_FORWARD);
+        try
+        {
+            sleep ((long) (1 + 100 * Math.random ()));
+        }
+        catch (InterruptedException e) {}
+    }
+
+    /**
+     *  Operation inform that the plane is ready for take off
+     *
+     *  It is called by the PILOT while flying to departure point
+     *
+     *    @return void
+     */
+
+    public synchronized void flyToDeparturePoint() {
+        System.out.println("PILOT: Flying to departure");
+        ((Pilot) Thread.currentThread()).setPilotState(States.FLYING_BACK);
+        try
+        {
+            sleep ((long) (1 + 100 * Math.random ()));
+        }
+        catch (InterruptedException e) {}
     }
 
     /**

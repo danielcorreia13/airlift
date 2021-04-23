@@ -1,4 +1,4 @@
-package lib;
+package myLib;
 
 /**
  *    Parametric FIFO derived from a parametric memory.
