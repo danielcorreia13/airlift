@@ -58,15 +58,22 @@ public class Pilot extends Thread
     {
         Boolean notEnd = true;
         
+        do {
+            parkAtTransferGate();
+            depAir.informPlaneReadyForBoarding();
+            plane.waitForAllInBoard();
+            flyToDestinationPoint();
 
-        parkAtTransferGate();
-        depAir.informPlaneReadyForBoarding();
-        plane.waitForAllInBoard();
-        flyToDestinationPoint();
+            destAir.announceArrival(/*plane.getNPassengers()*/);
 
-        destAir.announceArrival(/*plane.getNPassengers()*/);
+            flyToDeparturePoint();
 
-        flyToDeparturePoint();
+            System.out.println("\n\tTransported passengers so far (" + destAir.arrivedPassengers.size() +"): ");
+            for (Integer id : destAir.arrivedPassengers){
+                System.out.println(id);
+            }
+            System.out.println("\n");
+        }while (true);
 
     }
 

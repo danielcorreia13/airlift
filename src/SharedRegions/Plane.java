@@ -58,7 +58,7 @@ public class Plane
     public Plane (GeneralRep repos) {
     	generalRep = repos;
         try{
-        	passengerSeats = new MemFIFO<>(new Integer [Settings.minPassengers]); // Para ja fica assim
+        	passengerSeats = new MemFIFO<>(new Integer [Settings.maxPassengers]); // Para ja fica assim
         }catch (MemException e){
             System.err.println("Instantiation of plane seats FIFO failed: " + e.getMessage ());
             passengerSeats = null;
@@ -71,6 +71,9 @@ public class Plane
 
     public int getNPassengers(){
         return this.nPassengers;
+    }
+    public void passengerLeave(){
+        this.nPassengers--;
     }
 
     /*                                  HOSTESS                                      */
@@ -86,18 +89,18 @@ public class Plane
     
     public synchronized void informPlaneIsReadyToTakeOff()
     {
-    	while(!passengerSeats.full())
-    		try {
-    			wait();
-    		} catch (InterruptedException e){
-    			
-    		}
-    	System.out.println("[??] Aviao cheio -> " +passengerSeats.full());
+//    	while(!passengerSeats.full())
+//    		try {
+//    			wait();
+//    		} catch (InterruptedException e){
+//
+//    		}
+//    	System.out.println("[??] Aviao cheio -> " +passengerSeats.full());
     	allInBoard = true;
         ((Hostess) Thread.currentThread()).sethState(Hostess.States.READY_TO_FLY);
         
         System.out.println("HOSTESS->PILOT: Plane is ready for takeoff");
-        notify();
+        notifyAll();
 
     }
 
@@ -154,18 +157,18 @@ public class Plane
     {
     	int passId = ((Passenger) Thread.currentThread()).getpId();
     	 
-        try{
-            passengerSeats.write(passId);
-        }catch (MemException e){
-            System.err.println("Insertion of passenger in plane seats failed: " + e.getMessage());
-            System.exit(1);
-        }
+//        try{
+//            passengerSeats.write(passId);
+//        }catch (MemException e){
+//            System.err.println("Insertion of passenger in plane seats failed: " + e.getMessage());
+//            System.exit(1);
+//        }
         
         ((Passenger) Thread.currentThread()).setpState(Passenger.States.IN_FLIGHT);
         
         notifyAll();
         
-        //nPassengers++;
+        nPassengers++;
         
         System.out.println("PASSENGER "+passId+ ": Seated on plane");
 
@@ -186,7 +189,7 @@ public class Plane
     public synchronized void waitForAllInBoard() 
     {
     	System.out.println("PILOT: Waiting for all passengers on board");
-        //nPassengers = 0;
+        nPassengers = 0;
 
     	((Pilot) Thread.currentThread()).setPilotState(Pilot.States.WAIT_FOR_BOARDING);
     	try 
@@ -195,6 +198,7 @@ public class Plane
     			wait();
     	}
     	catch (InterruptedException e) {}
+    	allInBoard = false;
     	
     }
     

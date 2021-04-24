@@ -53,6 +53,9 @@ public class DepartureAirport
         readyForBoardig = false;
     }
 
+    public boolean empty(){
+        return passengerQueue.empty();
+    }
 
     /*                                   HOSTESS                                       */
     /*---------------------------------------------------------------------------------*/
@@ -138,6 +141,7 @@ public class DepartureAirport
                 wait();
             } catch (InterruptedException e) {}
         }
+        readyForBoardig = false;
     }
     
     

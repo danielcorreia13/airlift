@@ -1,5 +1,6 @@
 package ActiveEntity;
 
+import Main.Settings;
 import SharedRegions.*;
 
 /**
@@ -51,19 +52,22 @@ public class Hostess extends Thread
     {
         Boolean notEnd = true;
         int count = 0;
+        do {
+            depAir.waitForNextFlight();
 
-        depAir.waitForNextFlight();
-
-        prepareForPassBoarding();
-
-        while (count < 5){
-            count++;
-            depAir.waitForNextPassenger();
-            depAir.checkDocuments();
-
-        }
-        plane.informPlaneIsReadyToTakeOff();
-        
+            prepareForPassBoarding();
+            int max = Settings.maxPassengers;
+            int min = Settings.minPassengers;
+            while (true) {
+                if(plane.getNPassengers() == max)break;
+                if(depAir.empty() && plane.getNPassengers() > min)break;
+                if(count == Settings.nPassengers)break;
+                count++;
+                depAir.waitForNextPassenger();
+                depAir.checkDocuments();
+            }
+            plane.informPlaneIsReadyToTakeOff();
+        }while (count < Settings.nPassengers);
 
     }
 

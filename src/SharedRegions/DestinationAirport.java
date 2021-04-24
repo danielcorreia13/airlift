@@ -4,6 +4,8 @@ import ActiveEntity.Passenger;
 import ActiveEntity.Pilot;
 import myLib.MemException;
 
+import java.util.LinkedList;
+
 public class DestinationAirport
 {
 
@@ -16,6 +18,12 @@ public class DestinationAirport
     private Plane plane;
     
     private boolean lastPassengerOut;
+
+    // testes ------------------
+
+    public LinkedList<Integer> arrivedPassengers = new LinkedList<>();
+
+    // testes ---------------
 
     /**
      *  Destination Airport instantiation.
@@ -47,19 +55,26 @@ public class DestinationAirport
     // Passageiro
 	
 	public synchronized void leaveThePlane() {
-		int passId = -1;
-        
-		//System.out.println("PASSENGER " + ((Passenger) Thread.currentThread()).getpId() + ": Left the plane");
+		int passId = ((Passenger) Thread.currentThread()).getpId();
+
+
+        // testes ------------------
+
+        arrivedPassengers.add(passId);
+
+        // testes ---------------
+
+		System.out.println("PASSENGER " + passId + ": Left the plane");
         
 		((Passenger) Thread.currentThread()).setpState(Passenger.States.AT_DESTINATION);
-              
-        try {
-        	passId = plane.getPassengerSeats().read();
-        } catch (MemException e) {}
+        plane.passengerLeave();
+//        try {
+//        	passId = plane.getPassengerSeats().read();
+//        } catch (MemException e) {}
         
-        System.out.println("    PASSENGER: " +passId+ " left the plane");
+//        System.out.println("    PASSENGER: " +passId+ " left the plane");
         
-        if (plane.getPassengerSeats().empty())
+        if (plane.getNPassengers() == 0)
         	System.out.println("        PASSENGER : " +passId+ " Was the last to left the plane, notify the pilot");
         notifyAll();
             
@@ -82,7 +97,7 @@ public class DestinationAirport
         notifyAll();
         
         System.out.println("PILOT: Waiting for all passengers to leave the plane");
-        while ( !plane.getPassengerSeats().empty() ) {
+        while ( plane.getNPassengers() != 0) {
             try{          	
                 wait();
             }catch (InterruptedException e){}
