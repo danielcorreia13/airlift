@@ -21,6 +21,16 @@ public class DepartureAirport
      */
     private boolean readyForBoardig;
 
+    public int getnPassengers() {
+        return nPassengers;
+    }
+
+    /**
+     * Keeps track of how many passengers are entering the plane
+     */
+
+    private int nPassengers;
+
     /**
      * Reference to General Repository
      */
@@ -51,6 +61,7 @@ public class DepartureAirport
         Arrays.fill(passengers, null);
 
         readyForBoardig = false;
+        nPassengers = 0;
     }
 
     public boolean empty(){
@@ -79,7 +90,7 @@ public class DepartureAirport
         }
         
         System.out.println("HOSTESS: Passenger "+ passId +" is next on queue");
-        
+
         passengers[passId].setShowDocuments(true);
         
         ((Hostess) Thread.currentThread()).sethState(Hostess.States.CHECK_PASSENGER);
@@ -98,7 +109,7 @@ public class DepartureAirport
         System.out.println("	HOSTESS: Passenger "+ passId +" documents checked!");
         System.out.println("		HOSTESS: Passenger "+ passId +" allowed to board");
         passengers[passId].setpState(Passenger.States.IN_FLIGHT);
-        notify();
+        notifyAll();
     }
 
     /**
@@ -142,6 +153,7 @@ public class DepartureAirport
             } catch (InterruptedException e) {}
         }
         readyForBoardig = false;
+        nPassengers = 0;
     }
     
     
@@ -188,6 +200,7 @@ public class DepartureAirport
 
             }
         }
+        nPassengers++;
     }
 
     /**

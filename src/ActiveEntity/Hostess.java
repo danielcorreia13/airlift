@@ -59,9 +59,18 @@ public class Hostess extends Thread
             int max = Settings.maxPassengers;
             int min = Settings.minPassengers;
             while (true) {
-                if(plane.getNPassengers() == max)break;
-                if(depAir.empty() && plane.getNPassengers() > min)break;
-                if(count == Settings.nPassengers)break;
+                if(depAir.getnPassengers() == max) {
+                    System.out.println("HOSTESS: Plane full, informing pilot");
+                    break;
+                }
+                if(depAir.empty() && depAir.getnPassengers() > min){
+                    System.out.println("HOSTESS: No passengers waiting, informing pilot");
+                    break;
+                }
+                if(count == Settings.nPassengers){
+                    System.out.println("HOSTESS: Last passenger boarding, informing pilot");
+                    break;
+                }
                 count++;
                 depAir.waitForNextPassenger();
                 depAir.checkDocuments();

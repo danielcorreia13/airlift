@@ -68,10 +68,10 @@ public class Pilot extends Thread
 
             flyToDeparturePoint();
 
-            System.out.println("\n\tTransported passengers so far (" + destAir.arrivedPassengers.size() +"): ");
-            for (Integer id : destAir.arrivedPassengers){
-                System.out.println(id);
-            }
+//            System.out.println("\n\tTransported passengers so far (" + destAir.arrivedPassengers.size() +"): ");
+//            for (Integer id : destAir.arrivedPassengers){
+//                System.out.println(id);
+//            }
             System.out.println("\n");
         }while (true);
 
