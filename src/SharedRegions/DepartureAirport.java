@@ -191,7 +191,7 @@ public class DepartureAirport
             System.err.println("Insertion of passenger in waiting queue failed: " + e.getMessage());
             System.exit(1);
         }
-        notify();
+        notifyAll();
 
         while (!((Passenger) Thread.currentThread()).getShowDocuments()){
             try{
