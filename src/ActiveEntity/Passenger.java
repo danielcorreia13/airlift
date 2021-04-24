@@ -103,7 +103,7 @@ public class Passenger extends Thread
 
         depAir.waitInQueue();
         
-        //boardThePlane();
+        plane.boardThePlane();
 
         plane.waitForEndOfFlight();
 
@@ -115,22 +115,13 @@ public class Passenger extends Thread
 
     public void travelToAirport() {
         try
-        { sleep ((long) (1 + 10 * Math.random ()));
+        { sleep ((long) (1 + 250 * Math.random ()));
         }
         catch (InterruptedException e) {}
     }
     
-    public synchronized void boardThePlane() 
-    {
-    	int passId = ((Passenger) Thread.currentThread()).getpId();
-    	System.out.println("PASSENGER "+passId+ ": Boarding");  
-        try
-        { sleep ((long) (1 + 10 * Math.random ()));
-        }
-        catch (InterruptedException e) {}
-        
-        plane.waitForEndOfFlight();
-    }
+    
+
 
     /**
      *    Definition of the internal states of the passenger during his life cycle.

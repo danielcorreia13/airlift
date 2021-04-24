@@ -23,9 +23,10 @@ public class AirLift
 		
 		// Instanciar as regi�es partilhadas
 		generalRep = new GeneralRep();
-		sharedDepartureAirport = new DepartureAirport(generalRep);
-		sharedDestinationAirport = new DestinationAirport(generalRep);
+		
+		sharedDepartureAirport = new DepartureAirport(generalRep);		
 		sharedPlane = new Plane(generalRep);
+		sharedDestinationAirport = new DestinationAirport(generalRep, sharedPlane);
 		
 		// Instanciar as entidades ativas (Threads) - Para j� s�o passadas as interfaces que cada um usa.
 		pilot = new Pilot("Pilot1", sharedDepartureAirport, sharedDestinationAirport, sharedPlane /* Passar mais argumentos*/ );
@@ -44,7 +45,7 @@ public class AirLift
 	// Iniciar a simula��o
 	public void startSimulation()
 	{
-		System.out.println("Simula��o iniciada");
+		System.out.println("Simulacao iniciada\n\n");
 		
 		pilot.start();
 		hostess.start();

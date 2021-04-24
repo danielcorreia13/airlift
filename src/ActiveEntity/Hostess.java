@@ -62,18 +62,18 @@ public class Hostess extends Thread
             depAir.checkDocuments();
 
         }
-        System.out.println("Plane full");
         plane.informPlaneIsReadyToTakeOff();
         
 
     }
 
     public void prepareForPassBoarding() {
+    	System.out.println("HOSTESS: Preparing for pass board");
         try
         { sleep ((long) (1 + 10 * Math.random ()));
         }
         catch (InterruptedException e) {}
-        System.out.println("Prepare for pass board");
+        
         sethState(States.WAIT_FOR_PASSENGER);
     }
 

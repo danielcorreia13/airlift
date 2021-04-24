@@ -64,7 +64,7 @@ public class Pilot extends Thread
         plane.waitForAllInBoard();
         flyToDestinationPoint();
 
-        destAir.announceArrival(plane.getNPassengers());
+        destAir.announceArrival(/*plane.getNPassengers()*/);
 
         flyToDeparturePoint();
 
@@ -94,7 +94,9 @@ public class Pilot extends Thread
 
     public synchronized void flyToDestinationPoint()
     {
-        System.out.println("PILOT: Flying to destination");
+    	
+        System.out.println("\nPILOT: Flying to destination");
+        System.out.println("=================================\n");
         ((Pilot) Thread.currentThread()).setPilotState(Pilot.States.FLYING_FORWARD);
         try
         {
@@ -112,8 +114,10 @@ public class Pilot extends Thread
      */
 
     public synchronized void flyToDeparturePoint() {
-        System.out.println("PILOT: Flying to departure");
+        System.out.println("\nPILOT: Flying back to departure");
+        System.out.println("=================================\n");
         ((Pilot) Thread.currentThread()).setPilotState(States.FLYING_BACK);
+        notifyAll();
         try
         {
             sleep ((long) (1 + 100 * Math.random ()));

@@ -8,27 +8,40 @@ import java.util.Arrays;
 
 public class DepartureAirport
 {
-
+    /**
+     * Departure Passenger Queue
+     */
     private MemFIFO<Integer> passengerQueue;  // passengers waiting to check documents
 
+    // Maybe not necessary
     private Passenger passengers[];  // passenger objects
 
+    /**
+     * Ready for boarding flag
+     */
     private boolean readyForBoardig;
 
+    /**
+     * Reference to General Repository
+     */
     private final GeneralRep generalRep;
 
+   
+    /*                                  CONSTRUCTOR                                    */
+    /*---------------------------------------------------------------------------------*/    
+    
     /**
      *  Departure Airport instantiation.
      *
      *    @param repos reference to the general repository
      */
-
     public DepartureAirport(GeneralRep repos)
     {
         generalRep = repos;
-        try{
-            passengerQueue = new MemFIFO<>(new Integer [Settings.nPassengers]);
-        }catch (MemException e){
+        
+        try {
+        	passengerQueue = new MemFIFO<>(new Integer [Settings.nPassengers]);
+        } catch (MemException e) {
             System.err.println("Instantiation of waiting FIFO failed: " + e.getMessage ());
             passengerQueue = null;
             System.exit (1);
@@ -41,54 +54,84 @@ public class DepartureAirport
     }
 
 
-    //--------------------------------------------------------------------------------
-    // HOSTESS
-    //--------------------------------------------------------------------------------
-
-    public synchronized void checkDocuments() {
-        System.out.println("Check doc");
+    /*                                   HOSTESS                                       */
+    /*---------------------------------------------------------------------------------*/
+    
+    /**
+     *  Operation inform that the hostess needs do check the passenger documents
+     *
+     *  It is called by the HOSTESS when she is requesting a passenger documents
+     *
+     *    @return void
+     */
+    public synchronized void checkDocuments() 
+    {
         int passId = -1;
+        
         try {
             passId = passengerQueue.read();
-        }catch (MemException e){
+        } catch (MemException e) {
             System.err.println("Retrieval of passenger from waiting queue failed: " + e.getMessage());
             System.exit(1);
         }
+        
+        System.out.println("HOSTESS: Passenger "+ passId +" is next on queue");
+        
         passengers[passId].setShowDocuments(true);
         
         ((Hostess) Thread.currentThread()).sethState(Hostess.States.CHECK_PASSENGER);
         
         notifyAll();
         
-        while (passengers[passId].getShowDocuments()){
-            try{
+        while (passengers[passId].getShowDocuments())
+        {
+        	System.out.println("HOSTESS: Checking passenger "+ passId +" documents");
+            
+        	try {
                 wait();
-            }catch (InterruptedException e){}
+            } catch (InterruptedException e) {}
         }
-
+        
+        System.out.println("	HOSTESS: Passenger "+ passId +" documents checked!");
+        System.out.println("		HOSTESS: Passenger "+ passId +" allowed to board");
         passengers[passId].setpState(Passenger.States.IN_FLIGHT);
         notify();
     }
 
-
-    public synchronized void waitForNextPassenger() {
-        System.out.println("wait for next pass");
+    /**
+     *  Operation inform that the hostess is waiting for a passenger on the departure queue
+     *
+     *  It is called by the HOSTESS when she is waiting for a passenger on the queue
+     *
+     *    @return void
+     */
+    public synchronized void waitForNextPassenger() 
+    {
+    	System.out.println("HOSTESS: Checking if queue not empty");
         ((Hostess) Thread.currentThread()).sethState(Hostess.States.WAIT_FOR_PASSENGER);
         
         notifyAll();
         
-        while (passengerQueue.empty()) {
-            try {
-                wait();
-            } catch (InterruptedException e) {
-
-            }
+        while (passengerQueue.empty()) 
+        {
+        	System.out.println("HOSTESS: Waiting for next passenger");
+            
+        	try {
+            	wait();
+            } catch (InterruptedException e) {}
         }
     }
 
-
-    public synchronized void waitForNextFlight() {
-        System.out.println("Wait for next flight");
+    /**
+     *  Operation inform that the passenger is waiting for the end of the flight
+     *
+     *  It is called by the PASSENGER when he is on flight waiting to reach the destination
+     *
+     *    @return void
+     */
+    public synchronized void waitForNextFlight() 
+    {
+        System.out.println("HOSTESS: Waiting for next flight");
         while (!readyForBoardig) 
         {
             try {
@@ -97,20 +140,28 @@ public class DepartureAirport
         }
     }
     
-
-    //--------------------------------------------------------------------------------
-    // PASSENGER
-    //--------------------------------------------------------------------------------
-    public synchronized void waitInQueue() {
+    
+    /*                                 PASSENGER                                       */
+    /*---------------------------------------------------------------------------------*/
+    
+    /**
+     *  Operation inform the hostess that the passenger is waiting on departure airport queue
+     *
+     *  It is called by the PASSENGER when he is on the queue
+     *
+     *    @return void
+     */
+    public synchronized void waitInQueue() 
+    {
         int passId = ((Passenger) Thread.currentThread()).getpId();
         passengers[passId] = (Passenger) Thread.currentThread();
         passengers[passId].setpState(Passenger.States.IN_QUEUE);
-        System.out.println("Passenger " + passId + " arrived at airport");
+        System.out.println("[!] PASSENGER " + passId + ": Arrived at departure airport");
         //TODO: repository
 
-        try{
+        try {
             passengerQueue.write(passId);
-        }catch (MemException e){
+        } catch (MemException e){
             System.err.println("Insertion of passenger in waiting queue failed: " + e.getMessage());
             System.exit(1);
         }
@@ -133,24 +184,39 @@ public class DepartureAirport
 
             }
         }
-        System.out.println("Passenger " + passId + " ready for board");
     }
 
-
-    public synchronized void showDocuments() {
+    /**
+     *  Operation inform that the passenger is showing his documents
+     *
+     *  It is called by the PASSENGER when he need to show his documents to the hostess
+     *
+     *    @return void
+     */
+    public synchronized void showDocuments() 
+    {
         ((Passenger)Thread.currentThread()).setShowDocuments(false);
-        System.out.println("Show documents");
+        int passId = ((Passenger)Thread.currentThread()).getpId();
+        System.out.println("PASSENGER "+ passId +": Shows documents");
         notify();
     }
     
 
-    //--------------------------------------------------------------------------------
-    // PILOT
-    //--------------------------------------------------------------------------------
-    public synchronized void informPlaneReadyForBoarding() {
+    /*                                     PILOT                                       */
+    /*---------------------------------------------------------------------------------*/
+    
+    /**
+     *  Operation inform that the plane is ready for boarding
+     *
+     *  It is called by the PILOT when plane is parked on departure and ready for boarding
+     *
+     *    @return void
+     */
+    public synchronized void informPlaneReadyForBoarding() 
+    {
         readyForBoardig = true;
         ((Pilot) Thread.currentThread()).setPilotState(Pilot.States.READY_FOR_BOARDING);
-        System.out.println("PILOT: Ready for boarding");
+        System.out.println("PILOT: Plane is ready for boarding");
         notifyAll();
     }
 }

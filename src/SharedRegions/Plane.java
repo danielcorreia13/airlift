@@ -3,18 +3,51 @@ package SharedRegions;
 import ActiveEntity.Hostess;
 import ActiveEntity.Passenger;
 import ActiveEntity.Pilot;
+import SharedRegions.DestinationAirport;
+import Main.Settings;
+import myLib.MemException;
+import myLib.MemFIFO;
+import myLib.MemObject;
 
 public class Plane
 {
+    /**
+     * Plane Passenger Seats
+     */
+	private MemFIFO<Integer> passengerSeats;
 	
-    
-	//private int state; //0 - dep / 1 - flight / 2 - dest
-
-	private Passenger passengers[];  // passenger objects
+    /**
+     * Reference to pilot
+     */
 	private Pilot pilot;
+	
+    /**
+     * Reference do destination airport
+     */
+	private DestinationAirport dest;
+	
+    /**
+     * Reference to general repository
+     */
     private final GeneralRep generalRep;
+    
+    /**
+     * All passengers on board flag
+     */
     private boolean allInBoard;
+    
+    /**
+     * Number of passengers flag 
+     */
     private int nPassengers;
+    
+    /**
+     * Plane at destination flag
+     */
+    private boolean atDestination;
+
+    /*                                 CONSTRUCTOR                                   */
+    /*-------------------------------------------------------------------------------*/   
 
     /**
      *  Plane instantiation.
@@ -23,17 +56,25 @@ public class Plane
      */
 
     public Plane (GeneralRep repos) {
-        generalRep = repos;
-        //state = 0;
-        nPassengers = 0;
+    	generalRep = repos;
+        try{
+        	passengerSeats = new MemFIFO<>(new Integer [Settings.minPassengers]); // Para ja fica assim
+        }catch (MemException e){
+            System.err.println("Instantiation of plane seats FIFO failed: " + e.getMessage ());
+            passengerSeats = null;
+            System.exit (1);
+        }
+        this.allInBoard = false;
+        setAtDestination(false);
+        this.nPassengers = 0;
     }
 
     public int getNPassengers(){
-        return nPassengers;
+        return this.nPassengers;
     }
 
-    //                                  HOSTESS                                      //
-    //---------------------------------------------------------------------------------
+    /*                                  HOSTESS                                      */
+    /*-------------------------------------------------------------------------------*/
     
     /**
      *  Operation inform that the plane is ready for take off
@@ -45,14 +86,40 @@ public class Plane
     
     public synchronized void informPlaneIsReadyToTakeOff()
     {
+    	while(!passengerSeats.full())
+    		try {
+    			wait();
+    		} catch (InterruptedException e){
+    			
+    		}
+    	System.out.println("[??] Aviao cheio -> " +passengerSeats.full());
     	allInBoard = true;
         ((Hostess) Thread.currentThread()).sethState(Hostess.States.READY_TO_FLY);
         
         System.out.println("HOSTESS->PILOT: Plane is ready for takeoff");
         notify();
+
     }
 
     
+    
+  
+    public synchronized MemFIFO<Integer> getPassengerSeats() 
+    {
+		return passengerSeats;
+	}
+
+
+	public synchronized void setAtDestination(boolean atDestination)
+    {
+    	this.atDestination = atDestination;
+    	notifyAll();
+    }
+    
+    public synchronized boolean isAtDestination()
+    {
+    	return this.atDestination;
+    }
     
     //                                  PASSENGER                                    //
     //---------------------------------------------------------------------------------
@@ -67,12 +134,42 @@ public class Plane
     
     public synchronized void waitForEndOfFlight() 
     {
-    	int  passId = ((Passenger) Thread.currentThread()).getpId();
-    	System.out.println("PASSENGER "+ passId +": Waiting for the end of the flight");
-    	((Passenger) Thread.currentThread()).setpState(Passenger.States.IN_FLIGHT);
-    	nPassengers++;
+    	
+    	int passId = ((Passenger) Thread.currentThread()).getpId();
+    	System.out.println("[!] PASSENGER "+ passId +": Waiting for the end of the flight");
+    		
+    	while ( !isAtDestination() )
+    	{
+    		try {
+    			wait();
+    		} catch (InterruptedException e) {}
+    	}
+    	    	
+    	notifyAll();
+    	    	
     }
+    
 
+    public synchronized void boardThePlane()
+    {
+    	int passId = ((Passenger) Thread.currentThread()).getpId();
+    	 
+        try{
+            passengerSeats.write(passId);
+        }catch (MemException e){
+            System.err.println("Insertion of passenger in plane seats failed: " + e.getMessage());
+            System.exit(1);
+        }
+        
+        ((Passenger) Thread.currentThread()).setpState(Passenger.States.IN_FLIGHT);
+        
+        notifyAll();
+        
+        //nPassengers++;
+        
+        System.out.println("PASSENGER "+passId+ ": Seated on plane");
+
+    }
     
     
     //                                   PILOT                                      //
@@ -88,8 +185,9 @@ public class Plane
     
     public synchronized void waitForAllInBoard() 
     {
-    	System.out.println("PILOT: waiting for all passengers on board");
-        nPassengers = 0;
+    	System.out.println("PILOT: Waiting for all passengers on board");
+        //nPassengers = 0;
+
     	((Pilot) Thread.currentThread()).setPilotState(Pilot.States.WAIT_FOR_BOARDING);
     	try 
     	{
