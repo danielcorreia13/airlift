@@ -97,8 +97,6 @@ public class Passenger extends Thread
     @Override
     public void run()
     {
-        Boolean notEnd = true;
-
         travelToAirport();
 
         depAir.waitInQueue();
@@ -108,8 +106,6 @@ public class Passenger extends Thread
         plane.waitForEndOfFlight();
 
         destAir.leaveThePlane();
-
-
 
     }
 
