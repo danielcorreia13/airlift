@@ -92,8 +92,9 @@ public class DepartureAirport
         System.out.println("HOSTESS: Passenger "+ passId +" is next on queue");
 
         passengers[passId].setShowDocuments(true);
-        
+        generalRep.writeLog("Passenger " + passId + " checked");
         ((Hostess) Thread.currentThread()).sethState(Hostess.States.CHECK_PASSENGER);
+        generalRep.setHostess(Hostess.States.CHECK_PASSENGER);
         
         notifyAll();
         
@@ -105,10 +106,11 @@ public class DepartureAirport
                 wait();
             } catch (InterruptedException e) {}
         }
-        
+
         System.out.println("	HOSTESS: Passenger "+ passId +" documents checked!");
         System.out.println("		HOSTESS: Passenger "+ passId +" allowed to board");
         passengers[passId].setpState(Passenger.States.IN_FLIGHT);
+        generalRep.setPassengerState(passId, Passenger.States.IN_FLIGHT);
         notifyAll();
     }
 
@@ -122,9 +124,9 @@ public class DepartureAirport
     public synchronized void waitForNextPassenger() 
     {
     	System.out.println("HOSTESS: Checking if queue not empty");
+//        notifyAll();
         ((Hostess) Thread.currentThread()).sethState(Hostess.States.WAIT_FOR_PASSENGER);
-        
-        notifyAll();
+        generalRep.setHostess(Hostess.States.WAIT_FOR_PASSENGER);
         
         while (passengerQueue.empty()) 
         {
@@ -146,6 +148,8 @@ public class DepartureAirport
     public synchronized void waitForNextFlight() 
     {
         System.out.println("HOSTESS: Waiting for next flight");
+        ((Hostess) Thread.currentThread()).sethState(Hostess.States.WAIT_FOR_NEXT_FLIGHT);
+        generalRep.setHostess(Hostess.States.WAIT_FOR_NEXT_FLIGHT);
         while (!readyForBoardig) 
         {
             try {
@@ -154,6 +158,11 @@ public class DepartureAirport
         }
         readyForBoardig = false;
         nPassengers = 0;
+        generalRep.nextFlight();
+        ((Hostess) Thread.currentThread()).sethState(Hostess.States.WAIT_FOR_PASSENGER);
+
+        generalRep.setHostess(Hostess.States.WAIT_FOR_PASSENGER);
+
     }
     
     
@@ -172,6 +181,7 @@ public class DepartureAirport
         int passId = ((Passenger) Thread.currentThread()).getpId();
         passengers[passId] = (Passenger) Thread.currentThread();
         passengers[passId].setpState(Passenger.States.IN_QUEUE);
+        generalRep.setPassengerState(passId,Passenger.States.IN_QUEUE);
         System.out.println("[!] PASSENGER " + passId + ": Arrived at departure airport");
         //TODO: repository
 
@@ -232,7 +242,10 @@ public class DepartureAirport
     public synchronized void informPlaneReadyForBoarding() 
     {
         readyForBoardig = true;
+        generalRep.writeLog("Boarding Started");
         ((Pilot) Thread.currentThread()).setPilotState(Pilot.States.READY_FOR_BOARDING);
+        generalRep.setPilotState(Pilot.States.READY_FOR_BOARDING);
+
         System.out.println("PILOT: Plane is ready for boarding");
         notifyAll();
     }

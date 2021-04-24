@@ -98,6 +98,7 @@ public class Plane
 //    	System.out.println("[??] Aviao cheio -> " +passengerSeats.full());
     	allInBoard = true;
         ((Hostess) Thread.currentThread()).sethState(Hostess.States.READY_TO_FLY);
+        generalRep.setHostess(Hostess.States.READY_TO_FLY);
         
         System.out.println("HOSTESS->PILOT: Plane is ready for takeoff");
         notifyAll();
@@ -165,6 +166,7 @@ public class Plane
 //        }
         
         ((Passenger) Thread.currentThread()).setpState(Passenger.States.IN_FLIGHT);
+        generalRep.setPassengerState(passId, Passenger.States.IN_FLIGHT);
         
         notifyAll();
         
@@ -192,6 +194,7 @@ public class Plane
         nPassengers = 0;
 
     	((Pilot) Thread.currentThread()).setPilotState(Pilot.States.WAIT_FOR_BOARDING);
+    	generalRep.setPilotState(Pilot.States.WAIT_FOR_BOARDING);
     	try 
     	{
     		while( !allInBoard )
@@ -199,6 +202,10 @@ public class Plane
     	}
     	catch (InterruptedException e) {}
     	allInBoard = false;
+        ((Pilot) Thread.currentThread()).setPilotState(Pilot.States.FLYING_FORWARD);
+
+        generalRep.writeLog("Departed with " + nPassengers + " passengers");
+        generalRep.setPilotState(Pilot.States.FLYING_FORWARD);
     	
     }
     

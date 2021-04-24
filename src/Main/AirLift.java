@@ -22,7 +22,7 @@ public class AirLift
 	{
 		
 		// Instanciar as regi�es partilhadas
-		generalRep = new GeneralRep();
+		generalRep = new GeneralRep("LOG_FILE.txt");
 		
 		sharedDepartureAirport = new DepartureAirport(generalRep);		
 		sharedPlane = new Plane(generalRep);
@@ -65,6 +65,7 @@ public class AirLift
 		}catch (InterruptedException e){
 			System.out.println("Morreuuuuu");
 		}
+		generalRep.endReport();
 
 	}
 	

@@ -67,6 +67,7 @@ public class DestinationAirport
 		System.out.println("PASSENGER " + passId + ": Left the plane");
         
 		((Passenger) Thread.currentThread()).setpState(Passenger.States.AT_DESTINATION);
+		generalRep.setPassengerState(passId, Passenger.States.AT_DESTINATION);
         plane.passengerLeave();
 //        try {
 //        	passId = plane.getPassengerSeats().read();
@@ -74,8 +75,10 @@ public class DestinationAirport
         
 //        System.out.println("    PASSENGER: " +passId+ " left the plane");
         
-        if (plane.getNPassengers() == 0)
-        	System.out.println("        PASSENGER : " +passId+ " Was the last to left the plane, notify the pilot");
+        if (plane.getNPassengers() == 0) {
+            System.out.println("        PASSENGER : " + passId + " Was the last to left the plane, notify the pilot");
+
+        }
         notifyAll();
             
         }
@@ -90,6 +93,9 @@ public class DestinationAirport
         
         System.out.println("PILOT: Plane arrived at destination");
         ((Pilot) Thread.currentThread()).setPilotState(Pilot.States.DEBOARDING);
+        generalRep.writeLog("Arrived");
+        generalRep.setPilotState(Pilot.States.DEBOARDING);
+
         
         System.out.println("    [!] Set destinanion flag at TRUE");
         plane.setAtDestination(true);  
@@ -102,7 +108,12 @@ public class DestinationAirport
                 wait();
             }catch (InterruptedException e){}
         }
-        
+
+        ((Pilot) Thread.currentThread()).setPilotState(Pilot.States.FLYING_BACK);
+        generalRep.writeLog("Returning");
+        generalRep.setPilotState(Pilot.States.FLYING_BACK);
+
+
         System.out.println("\n\n    [!] Set destinanion flag at FALSE");
         plane.setAtDestination(false);  
     }

@@ -104,7 +104,6 @@ public class Pilot extends Thread
     	
         System.out.println("\nPILOT: Flying to destination");
         System.out.println("=================================\n");
-        ((Pilot) Thread.currentThread()).setPilotState(Pilot.States.FLYING_FORWARD);
         try
         {
             sleep ((long) (1 + 100 * Math.random ()));
@@ -123,7 +122,7 @@ public class Pilot extends Thread
     public synchronized void flyToDeparturePoint() {
         System.out.println("\nPILOT: Flying back to departure");
         System.out.println("=================================\n");
-        ((Pilot) Thread.currentThread()).setPilotState(States.FLYING_BACK);
+
         notifyAll();
         try
         {

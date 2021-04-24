@@ -32,6 +32,7 @@ public class Hostess extends Thread
 
     public void sethState(int hState) {
         this.hState = hState;
+
     }
 
     /**
@@ -87,7 +88,7 @@ public class Hostess extends Thread
         }
         catch (InterruptedException e) {}
         
-        sethState(States.WAIT_FOR_PASSENGER);
+
     }
 
     /**
