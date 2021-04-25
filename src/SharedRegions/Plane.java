@@ -40,6 +40,11 @@ public class Plane
      * Number of passengers flag 
      */
     private int nPassengers;
+
+    /**
+     * Expected number of passengers
+     */
+    private int expectedPass;
     
     /**
      * Plane at destination flag
@@ -67,6 +72,7 @@ public class Plane
         this.allInBoard = false;
         setAtDestination(false);
         this.nPassengers = 0;
+        this.expectedPass = 0;
     }
 
     public int getNPassengers(){
@@ -90,7 +96,7 @@ public class Plane
      *    @return void
      */
     
-    public synchronized void informPlaneIsReadyToTakeOff()
+    public synchronized void informPlaneIsReadyToTakeOff(int nPass)
     {
 //    	while(!passengerSeats.full())
 //    		try {
@@ -99,10 +105,19 @@ public class Plane
 //
 //    		}
 //    	System.out.println("[??] Aviao cheio -> " +passengerSeats.full());
-    	allInBoard = true;
 
+        while (nPassengers != nPass){
+            try{
+                wait();
+            }catch (InterruptedException e){}
+        }
+
+
+    	allInBoard = true;
+//        nPassengers = nPass;
         ((Hostess) Thread.currentThread()).sethState(Hostess.States.READY_TO_FLY);
-        generalRep.setHostess(Hostess.States.READY_TO_FLY);        
+        generalRep.setHostess(Hostess.States.READY_TO_FLY);
+        generalRep.writeLog("Departed with " + nPass + " passengers");
         System.out.println("HOSTESS->PILOT: Plane is ready for takeoff");
         
         notifyAll();
@@ -160,8 +175,10 @@ public class Plane
 
     public synchronized void boardThePlane()
     {
-    	int passId = ((Passenger) Thread.currentThread()).getpId();
-    	 
+
+        int passId = ((Passenger) Thread.currentThread()).getpId();
+        ((Passenger) Thread.currentThread()).setpState(Passenger.States.IN_FLIGHT);
+        generalRep.setPassengerState(passId, Passenger.States.IN_FLIGHT);
 //        try{
 //            passengerSeats.write(passId);
 //        }catch (MemException e){
@@ -172,13 +189,12 @@ public class Plane
         //((Passenger) Thread.currentThread()).setpState(Passenger.States.IN_FLIGHT);
         //generalRep.setPassengerState(passId, Passenger.States.IN_FLIGHT);
     	
-    	passengerBoard();
-        notifyAll();
-        
-        
-        
-        System.out.println("PASSENGER "+passId+ ": Seated on plane");
+//    	passengerBoard();
+//        notifyAll();
 
+        System.out.println("PASSENGER "+passId+ ": Seated on plane");
+        nPassengers++;
+        notifyAll();
     }
     
     
@@ -193,7 +209,7 @@ public class Plane
      *    @return void
      */
     
-    public synchronized void waitForAllInBoard() 
+    public synchronized int waitForAllInBoard()
     {
     	System.out.println("PILOT: Waiting for all passengers on board");
         nPassengers = 0;
@@ -202,7 +218,7 @@ public class Plane
     	generalRep.setPilotState(Pilot.States.WAIT_FOR_BOARDING);
     	try 
     	{
-    		while( !allInBoard )
+            while( !allInBoard)
     			wait();
     	}
     	catch (InterruptedException e) {}
@@ -211,7 +227,7 @@ public class Plane
 
         //generalRep.writeLog("Departed with " + nPassengers + " passengers");
         generalRep.setPilotState(Pilot.States.FLYING_FORWARD);
-    	
+    	return nPassengers;
     }
     
 

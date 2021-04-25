@@ -76,9 +76,8 @@ public class Hostess extends Thread
                 depAir.waitForNextPassenger();
                 depAir.checkDocuments();
             }
-            plane.informPlaneIsReadyToTakeOff();
+            plane.informPlaneIsReadyToTakeOff(depAir.getnPassengers());
         }while (count < Settings.nPassengers);
-
     }
 
     public void prepareForPassBoarding() {

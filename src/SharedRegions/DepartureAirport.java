@@ -33,7 +33,19 @@ public class DepartureAirport
      */
     private final GeneralRep generalRep;
 
-   
+    /**
+     * Show documents flags
+     */
+
+    private boolean showDocuments[];
+
+    /**
+     * Allowed to board flags
+     */
+
+    private boolean canBoard[];
+
+
     /*                                  CONSTRUCTOR                                    */
     /*---------------------------------------------------------------------------------*/    
     
@@ -55,6 +67,10 @@ public class DepartureAirport
         }
 
         passengers = new Passenger[Settings.nPassengers];
+        showDocuments = new boolean[Settings.nPassengers];
+        canBoard = new boolean[Settings.nPassengers];
+        Arrays.fill(canBoard, false);
+        Arrays.fill(showDocuments, false);
         Arrays.fill(passengers, null);
 
         readyForBoardig = false;
@@ -92,14 +108,15 @@ public class DepartureAirport
         
         System.out.println("HOSTESS: Passenger "+ passId +" is next on queue");
 
-        passengers[passId].setShowDocuments(true);
+        showDocuments[passId] = true;
+
         generalRep.writeLog("Passenger " + passId + " checked");
         ((Hostess) Thread.currentThread()).sethState(Hostess.States.CHECK_PASSENGER);
         generalRep.setHostess(Hostess.States.CHECK_PASSENGER);
         
         notifyAll();
         
-        while (passengers[passId].getShowDocuments())
+        while (showDocuments[passId])
         {
         	System.out.println("HOSTESS: Checking passenger "+ passId +" documents");
             
@@ -110,8 +127,9 @@ public class DepartureAirport
 
         System.out.println("	HOSTESS: Passenger "+ passId +" documents checked!");
         System.out.println("		HOSTESS: Passenger "+ passId +" allowed to board");
-        passengers[passId].setpState(Passenger.States.IN_FLIGHT);
-        generalRep.setPassengerState(passId, Passenger.States.IN_FLIGHT);
+
+        canBoard[passId] = true;
+
         nPassengers++;
         notifyAll();
     }
@@ -160,7 +178,7 @@ public class DepartureAirport
         }
         readyForBoardig = false;
         nPassengers = 0;
-        generalRep.nextFlight();
+
         ((Hostess) Thread.currentThread()).sethState(Hostess.States.WAIT_FOR_PASSENGER);
 
         generalRep.setHostess(Hostess.States.WAIT_FOR_PASSENGER);
@@ -195,7 +213,7 @@ public class DepartureAirport
         }
         notifyAll();
 
-        while (!((Passenger) Thread.currentThread()).getShowDocuments()){
+        while (!showDocuments[passId]){
             try{
                 wait();
             }catch (InterruptedException e){
@@ -205,7 +223,7 @@ public class DepartureAirport
 
         showDocuments();
 
-        while (((Passenger) Thread.currentThread()).getpState() != Passenger.States.IN_FLIGHT){
+        while (!canBoard[passId]){
             try{
                 wait();
             }catch (InterruptedException e){
@@ -224,10 +242,11 @@ public class DepartureAirport
      */
     public synchronized void showDocuments() 
     {
-        ((Passenger)Thread.currentThread()).setShowDocuments(false);
+
         int passId = ((Passenger)Thread.currentThread()).getpId();
+        showDocuments[passId] = false;
         System.out.println("PASSENGER "+ passId +": Shows documents");
-        notify();
+        notifyAll();
     }
     
 
@@ -244,11 +263,19 @@ public class DepartureAirport
     public synchronized void informPlaneReadyForBoarding() 
     {
         readyForBoardig = true;
+        generalRep.nextFlight();
         generalRep.writeLog("Boarding Started");
         ((Pilot) Thread.currentThread()).setPilotState(Pilot.States.READY_FOR_BOARDING);
         generalRep.setPilotState(Pilot.States.READY_FOR_BOARDING);
 
         System.out.println("PILOT: Plane is ready for boarding");
         notifyAll();
+    }
+
+    public void parkAtTransferGate() {
+        ((Pilot) Thread.currentThread()).setPilotState(Pilot.States.AT_TRANSFER_GATE);
+        generalRep.setPilotState(Pilot.States.AT_TRANSFER_GATE);
+        System.out.println("PILOT: Park transfer gate");
+
     }
 }

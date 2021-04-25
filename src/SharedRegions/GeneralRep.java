@@ -11,6 +11,7 @@ import Main.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class GeneralRep 
@@ -48,6 +49,12 @@ public class GeneralRep
 	
 	 int nPassenger;
 
+	/**
+	 * Number of passengers per flight
+	 */
+
+	private int nPassFlight[];
+
 //	/**
 //	 *  Number of passengers in queue
 //	 */
@@ -65,7 +72,7 @@ public class GeneralRep
 //	 */
 //
 //	private int nPassArrived;
-	 private int hostess_last_state;
+//	 private int hostess_last_state;
 
 
 	/**
@@ -94,7 +101,9 @@ public class GeneralRep
 	      pilotState = Pilot.States.AT_TRANSFER_GATE;
 	      flightId = 0;
 	      nPassenger = 0;
-	      this.hostess_last_state = 100;
+//	      this.hostess_last_state = 100;
+	      nPassFlight = new int[10];
+	      Arrays.fill(nPassFlight, 0);
 
 	      reportInitialStatus ();
 	   }
@@ -210,31 +219,31 @@ public class GeneralRep
 		switch (hostessState)
 		{
 			case Hostess.States.CHECK_PASSENGER:
-				hostess_last_state = Hostess.States.CHECK_PASSENGER;
+//				hostess_last_state = Hostess.States.CHECK_PASSENGER;
 				lineStatus += " CKPS ";
 				break;
 			//-----------------------------------------------------------------------------	
 			case Hostess.States.READY_TO_FLY:
 				lineStatus += " RDTF ";
 
-				for (int i = 0; i < Settings.nPassengers; i++)
-					if (passengerState[i] == Passenger.States.IN_FLIGHT)
-						nPassenger++;
-				
-				if (Hostess.States.READY_TO_FLY != hostess_last_state)	
-				{
-					hostess_last_state = Hostess.States.READY_TO_FLY;
-					log.println ("\nFlight "+ flightId +": Departed with "+nPassenger+" passengers ");
-				}
-				
-				nPassenger = 0;
+//				for (int i = 0; i < Settings.nPassengers; i++)
+//					if (passengerState[i] == Passenger.States.IN_FLIGHT)
+//						nPassenger++;
+//
+//				if (Hostess.States.READY_TO_FLY != hostess_last_state)
+//				{
+//					hostess_last_state = Hostess.States.READY_TO_FLY;
+//					log.println ("\nFlight "+ flightId +": Departed with "+nPassenger+" passengers ");
+//				}
+//
+//				nPassenger = 0;
 				break;
 			//------------------------------------------------------------------------------	
 			case Hostess.States.WAIT_FOR_NEXT_FLIGHT: lineStatus += " WTFL ";
-				hostess_last_state = Hostess.States.WAIT_FOR_NEXT_FLIGHT;
+//				hostess_last_state = Hostess.States.WAIT_FOR_NEXT_FLIGHT;
 				break;
 			case Hostess.States.WAIT_FOR_PASSENGER: lineStatus += " WTFP ";
-				hostess_last_state = Hostess.States.WAIT_FOR_NEXT_FLIGHT;
+//				hostess_last_state = Hostess.States.WAIT_FOR_NEXT_FLIGHT;
 				break;
 		}
 
@@ -253,7 +262,10 @@ public class GeneralRep
 			}
 
 		lineStatus += "  " + nPassQueue + "    " + nPassPlane + "    " + nPassArrived;
-
+		if (hostessState == Hostess.States.READY_TO_FLY){
+			if (nPassPlane > nPassFlight[flightId-1])
+				nPassFlight[flightId-1] = nPassPlane;
+		}
 		log.println (lineStatus);
 		log.flush();
 	}
@@ -263,6 +275,11 @@ public class GeneralRep
      */
 
     public void endReport(){
+    	log.println("\nAirlift sum up:");
+		for (int i = 0; i < nPassFlight.length; i++) {
+			if (nPassFlight[i] == 0) break;
+			log.println("Flight " + (i+1) + " transported " + nPassFlight[i] + " passengers");
+		}
         log.close();
     }
 }

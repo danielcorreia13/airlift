@@ -1,5 +1,6 @@
 package ActiveEntity;
 
+import Main.Settings;
 import SharedRegions.*;
 
 /**
@@ -59,12 +60,14 @@ public class Pilot extends Thread
         Boolean notEnd = true;
         
         do {
-            parkAtTransferGate();
+            depAir.parkAtTransferGate();
             depAir.informPlaneReadyForBoarding();
-            plane.waitForAllInBoard();
+            int nPass = plane.waitForAllInBoard();
             flyToDestinationPoint();
 
-            destAir.announceArrival(/*plane.getNPassengers()*/);
+            plane.setAtDestination(true);
+            destAir.announceArrival(nPass);
+            plane.setAtDestination(false);
 
             flyToDeparturePoint();
 
@@ -73,23 +76,20 @@ public class Pilot extends Thread
 //                System.out.println(id);
 //            }
             System.out.println("\n");
-        }while (true);
+        }while (destAir.getTotalPassengers() != Settings.nPassengers);
 
     }
 
-    public void parkAtTransferGate() {
-    	
-        try
-        { 
-        	sleep ((long) (1 + 100 * Math.random ()));
-        }
-        catch (InterruptedException e) {}
-        
-        this.pilotState = States.AT_TRANSFER_GATE;
-        System.out.println("PILOT: Park transfer gate");
-        
-        
-    }
+//    public void parkAtTransferGate() {
+//        this.pilotState = States.AT_TRANSFER_GATE;
+//        System.out.println("PILOT: Park transfer gate");
+//        try
+//        {
+//        	sleep ((long) (1 + 100 * Math.random ()));
+//        }
+//        catch (InterruptedException e) {}
+//
+//    }
 
     /**
      *  Operation inform that the plane is going to the destination point

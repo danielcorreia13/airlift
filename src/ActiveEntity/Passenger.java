@@ -28,12 +28,7 @@ public class Passenger extends Thread
      */
 
     private final Plane plane;
-      
-    /**
-     * Show documents flag
-     */
 
-    private boolean showDocuments;
 
     /**
      *  Passenger identification
@@ -65,31 +60,8 @@ public class Passenger extends Thread
         this.plane = plane;
         this.pState = States.GOING_TO_AIRPORT;
         this.pId = id;
-        this.showDocuments = false;
-    }
-    
-    /**
-     *  Operation to show passenger documents
-     *
-     *  It is used when hostess request passenger documents
-     *
-     *    @return boolean
-     */   
-    public boolean getShowDocuments() {
-        return showDocuments;
     }
 
-    /**
-     *  Operation to set passenger documents
-     *
-     *  It is used when hostess checked the passenger documents
-     *
-     *    @return void
-     */ 
-    public void setShowDocuments(boolean showDocuments) {
-        this.showDocuments = showDocuments;
-    }
-    
     /**
      *  Operation to get the passenger state
      *
