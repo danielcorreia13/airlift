@@ -10,22 +10,7 @@ import myLib.MemFIFO;
 import myLib.MemObject;
 
 public class Plane
-{
-    /**
-     * Plane Passenger Seats
-     */
-	private MemFIFO<Integer> passengerSeats;
-	
-    /**
-     * Reference to pilot
-     */
-	private Pilot pilot;
-	
-    /**
-     * Reference do destination airport
-     */
-	private DestinationAirport dest;
-	
+{	
     /**
      * Reference to general repository
      */
@@ -40,12 +25,7 @@ public class Plane
      * Number of passengers flag 
      */
     private int nPassengers;
-
-    /**
-     * Expected number of passengers
-     */
-    private int expectedPass;
-    
+   
     /**
      * Plane at destination flag
      */
@@ -59,29 +39,35 @@ public class Plane
      *
      *    @param repos reference to the general repository
      */
-
-    public Plane (GeneralRep repos) {
+    public Plane (GeneralRep repos) 
+    {
     	generalRep = repos;
-        try{
-        	passengerSeats = new MemFIFO<>(new Integer [Settings.maxPassengers]); // Para ja fica assim
-        }catch (MemException e){
-            System.err.println("Instantiation of plane seats FIFO failed: " + e.getMessage ());
-            passengerSeats = null;
-            System.exit (1);
-        }
         this.allInBoard = false;
         setAtDestination(false);
         this.nPassengers = 0;
-        this.expectedPass = 0;
     }
 
-    public int getNPassengers(){
+    /**
+     * Get number of passengers
+     */
+    public int getNPassengers()
+    {
         return this.nPassengers;
     }
-    public void passengerLeave(){
+    
+    /**
+     * Decrement number of passengers when they leave at destination
+     */   
+    public void passengerLeave()
+    {
         this.nPassengers--;
     }
-    public void passengerBoard() {
+    
+    /**
+     * Increment number of passengers when they departure at destination
+     */    
+    public void passengerBoard() 
+    {
     	this.nPassengers++;
     }
 
@@ -91,54 +77,50 @@ public class Plane
     /**
      *  Operation inform that the plane is ready for take off
      *
-     *  It is called by the HOSTESS when all passengers are on board, requiring the minimum capacity of the plane
-     *
-     *
-     */
-    
+     *  It is called by the HOSTESS when all passengers are on board, 
+     *	Requiring minimum passengers on board and departure queue is empty
+     *  Or if maximum passengers on board was reached
+     *  Or if number of passengers on board is between min and max, and departure queue is empty
+     *  
+     */    
     public synchronized void informPlaneIsReadyToTakeOff(int nPass)
     {
-//    	while(!passengerSeats.full())
-//    		try {
-//    			wait();
-//    		} catch (InterruptedException e){
-//
-//    		}
-//    	System.out.println("[??] Aviao cheio -> " +passengerSeats.full());
-
         while (nPassengers != nPass){
             try{
                 wait();
             }catch (InterruptedException e){}
         }
 
-
     	allInBoard = true;
-//        nPassengers = nPass;
+    	
         ((Hostess) Thread.currentThread()).sethState(Hostess.States.READY_TO_FLY);
         generalRep.setHostess(Hostess.States.READY_TO_FLY);
         generalRep.writeLog("Departed with " + nPass + " passengers");
-        System.out.println("HOSTESS->PILOT: Plane is ready for takeoff");
+        //System.out.println("HOSTESS->PILOT: Plane is ready for takeoff");
         
         notifyAll();
 
     }
 
     
-    
-  
-    public synchronized MemFIFO<Integer> getPassengerSeats() 
-    {
-		return passengerSeats;
-	}
-
-
+    /**
+     *  Operation to set plane at destination
+     *
+     * It is called by pilot on destination point
+     */    
 	public synchronized void setAtDestination(boolean atDestination)
     {
     	this.atDestination = atDestination;
     	notifyAll();
     }
     
+    /**
+     *  Operation inform that plane is at destination
+     *
+     *  It is called by the pilot to notify passengers that the plane was landed
+     *
+     *
+     */ 
     public synchronized boolean isAtDestination()
     {
     	return this.atDestination;
@@ -153,13 +135,12 @@ public class Plane
      *  It is called by the PASSENGER when he is on the plane
      *
      *
-     */
-    
+     */   
     public synchronized void waitForEndOfFlight() 
     {
     	
     	int passId = ((Passenger) Thread.currentThread()).getpId();
-    	System.out.println("[!] PASSENGER "+ passId +": Waiting for the end of the flight");
+    	//System.out.println("[!] PASSENGER "+ passId +": Waiting for the end of the flight");
     		
     	while ( !isAtDestination() )
     	{
@@ -172,27 +153,13 @@ public class Plane
     	    	
     }
     
-
     public synchronized void boardThePlane()
     {
 
         int passId = ((Passenger) Thread.currentThread()).getpId();
         ((Passenger) Thread.currentThread()).setpState(Passenger.States.IN_FLIGHT);
         generalRep.setPassengerState(passId, Passenger.States.IN_FLIGHT);
-//        try{
-//            passengerSeats.write(passId);
-//        }catch (MemException e){
-//            System.err.println("Insertion of passenger in plane seats failed: " + e.getMessage());
-//            System.exit(1);
-//        }
-        
-        //((Passenger) Thread.currentThread()).setpState(Passenger.States.IN_FLIGHT);
-        //generalRep.setPassengerState(passId, Passenger.States.IN_FLIGHT);
-    	
-//    	passengerBoard();
-//        notifyAll();
-
-        System.out.println("PASSENGER "+passId+ ": Seated on plane");
+        //System.out.println("PASSENGER "+passId+ ": Seated on plane");
         nPassengers++;
         notifyAll();
     }
@@ -207,11 +174,10 @@ public class Plane
      *  It is called by the PILOT while waiting for all passengers on board
      *
      *    @return void
-     */
-    
+     */   
     public synchronized int waitForAllInBoard()
     {
-    	System.out.println("PILOT: Waiting for all passengers on board");
+    	//System.out.println("PILOT: Waiting for all passengers on board");
         nPassengers = 0;
 
     	((Pilot) Thread.currentThread()).setPilotState(Pilot.States.WAIT_FOR_BOARDING);
@@ -225,12 +191,7 @@ public class Plane
     	allInBoard = false;
         ((Pilot) Thread.currentThread()).setPilotState(Pilot.States.FLYING_FORWARD);
 
-        //generalRep.writeLog("Departed with " + nPassengers + " passengers");
         generalRep.setPilotState(Pilot.States.FLYING_FORWARD);
     	return nPassengers;
     }
-    
-
-
-
 }

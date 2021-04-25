@@ -16,182 +16,171 @@ import java.util.Objects;
 
 public class GeneralRep 
 {
-	 /**
-	   *  Log file handler.
-	   */
-
-        private PrintWriter log;       
-
-
-	  /**
-	   *  State of the passengers.
-	   */
-
-	   private final int [] passengerState;
-
-	  /**
-	   *  State of the hostess.
-	   */
-
-	   private int hostessState;
-	   
-	   
-	  /**
-	   *  State of the hostess.
-	   */
-	   private int pilotState;
+	/**
+	*  Log file handler.
+	*/
+	private PrintWriter log;       
 
 	/**
-	 *  Current flight number
-	 */
+	*  State of the passengers.
+	*/
+	private final int [] passengerState;
 
+	/**
+	*  State of the hostess.
+	*/
+	private int hostessState;
+	   
+	   
+	/**
+	*  State of the hostess.
+	*/
+	private int pilotState;
+
+	/**
+	*  Current flight number
+	*/
 	private int flightId;
 	
-	 int nPassenger;
+	int nPassenger;
 
 	/**
-	 * Number of passengers per flight
-	 */
-
+	* Number of passengers per flight
+	*/
 	private int nPassFlight[];
 
-//	/**
-//	 *  Number of passengers in queue
-//	 */
-//
-//	private int nPassQueue;
-//
-//	/**
-//	 *  Number of passengers in queue
-//	 */
-//
-//	private int nPassPlane;
-//
-//	/**
-//	 *  Number of passengers in queue
-//	 */
-//
-//	private int nPassArrived;
-//	 private int hostess_last_state;
-
-
+	
+	
+	/*                                    CONSTRUCTOR                                */
+	/*-------------------------------------------------------------------------------*/
 	/**
-	   *   Instantiation of a general repository object.
-	   *
-	   *     @param logFileName name of the logging file
-	   *
-	   */
-	   public GeneralRep (String logFileName)
-	   {
-	       try {
-               if ((logFileName == null) || Objects.equals(logFileName, ""))
-                   log = new PrintWriter("logger");
-               else
-                   log = new PrintWriter(logFileName);
-           }catch (IOException e){
-               System.out.println ("The operation of creating the file " + logFileName + " failed!");
-               System.exit (1);
-           }
-
-	      passengerState = new int [Settings.nPassengers];
-	      for (int i = 0; i < Settings.nPassengers; i++)
-	        passengerState[i] = Passenger.States.GOING_TO_AIRPORT;
-	      
-	      hostessState = Hostess.States.WAIT_FOR_NEXT_FLIGHT;
-	      pilotState = Pilot.States.AT_TRANSFER_GATE;
-	      flightId = 0;
-	      nPassenger = 0;
-//	      this.hostess_last_state = 100;
-	      nPassFlight = new int[10];
-	      Arrays.fill(nPassFlight, 0);
-
-	      reportInitialStatus ();
+	*   Instantiation of a general repository object.
+	*
+	*     @param logFileName name of the logging file
+	*
+	*/
+	public GeneralRep (String logFileName)
+	{
+	   try {
+	       if ((logFileName == null) || Objects.equals(logFileName, ""))
+	    	   log = new PrintWriter("logger");
+	       else
+	           log = new PrintWriter(logFileName);
+	   }catch (IOException e){
+	       System.out.println ("The operation of creating the file " + logFileName + " failed!");
+	       System.exit (1);
 	   }
+
+	  passengerState = new int [Settings.nPassengers];
+	  for (int i = 0; i < Settings.nPassengers; i++)
+	    passengerState[i] = Passenger.States.GOING_TO_AIRPORT;
+	  
+	  hostessState = Hostess.States.WAIT_FOR_NEXT_FLIGHT;
+	  pilotState = Pilot.States.AT_TRANSFER_GATE;
+	  flightId = 0;
+	  nPassenger = 0;
+	  nPassFlight = new int[10];
+	  Arrays.fill(nPassFlight, 0);
+	
+	  reportInitialStatus ();
+   }
 	   
 	   
-	    /*                                     SETTING STATES                            */
-	    /*-------------------------------------------------------------------------------*/	   
+    /*                                     SETTING STATES                            */
+    /*-------------------------------------------------------------------------------*/	   
 
-	   /**
-	    *   Set Passenger state.
-	    *
-	    *     @param id barber id
-	    *     @param state barber state
-	    */
-	    public synchronized void setPassengerState (int id, int state)
-	    {
-	    	
-	    	if (passengerState[id] != state) 
-	    	{
-		    	passengerState[id] = state;
-		    	reportStatus ();
-	    	}
-	    	else	    		
-	    		return;
-	    }
+   /**
+    *   Set Passenger state.
+    *
+    *     @param id passenger id
+    *     @param state passenger state
+    */
+    public synchronized void setPassengerState (int id, int state)
+    {
+    	
+    	if (passengerState[id] != state) 
+    	{
+	    	passengerState[id] = state;
+	    	reportStatus ();
+    	}
+    	else	    		
+    		return;
+    }
 
-	   /**
-	    *   Set customer state.
-	    *
-	    *
-	    *     @param state customer state
-	    */
-	    public synchronized void setPilotState (int state)
-	    {
-	    	if (pilotState != state)
-	    	{
-	    		pilotState = state;
-	    		reportStatus ();
-	    	}
-	    	else
-	    		return;
-	    }
+   /**
+    *   Set pilot state.
+    *
+    *     @param state pilot state
+    */
+    public synchronized void setPilotState (int state)
+    {
+    	if (pilotState != state)
+    	{
+    		pilotState = state;
+    		reportStatus ();
+    	}
+    	else
+    		return;
+    }
+    
+    /**
+    *  Set hosstess state
+    *  
+    *	@param state hostess state
+    */	    
+    public synchronized void setHostess (int state)
+    {
+    	if (hostessState != state)
+    	{
+    		hostessState = state;
+    		reportStatus ();
+    	}
+    	else	    		
+    		return;
+    }
+    
+    /**
+    *  Increment next id flight
+    */
+    public synchronized void nextFlight(){
+    		flightId++;
+	}
+    
+    /**
+    *  Write to the logging file, called by another instance.
+    *  
+    *	@param msg
+    */
+	public synchronized void writeLog(String msg){
+    	log.println("\nFlight " + flightId + ": " + msg);
+	}
 	    
-	    public synchronized void setHostess (int state)
-	    {
-	    	if (hostessState != state)
-	    	{
-	    		hostessState = state;
-	    		reportStatus ();
-	    	}
-	    	else	    		
-	    		return;
-	    }
+    /*                                     STATUS                                    */
+    /*-------------------------------------------------------------------------------*/
 
-	    public synchronized void nextFlight(){
-	    		flightId++;
-		}
+    /**
+    *  Write the header to the logging file.
+    *
+    *  The hostess is waiting for passenger and pilot is sleeping waiting for passengers on board
+    *  Passengers are going to airport
+    *  Internal operation.
+    */   
+   private void reportInitialStatus ()
+   {
 
-		public synchronized void writeLog(String msg){
-	    	log.println("\nFlight " + flightId + ": " + msg);
-		}
-	    
-	    /*                                     STATUS                                    */
-	    /*-------------------------------------------------------------------------------*/
-
-	    /**
-	    *  Write the header to the logging file.
-	    *
-	    *  The hostess is waiting for passenger and pilot is sleeping waiting for passengers on board
-	    *  Passengers are going to airport
-	    *  Internal operation.
-	    */   
-	   private void reportInitialStatus ()
-	   {
-
-	      log.println ("\n\tAirlift - Description of the internal state:\n\n");
-	      //log.println ("\nNumber of iterations = " + nIter + "\n");
-	      log.println ("  PT    HT   P00   P01   P02   P03   P04   P05   P06   P07   P08   P09   P10   P11   P12   P13   P14   P15   P16   P17   P18   P19   P20   InQ  InF  PTAL");
-	      log.flush();
-	      reportStatus ();
-	   }
+      log.println ("\n\tAirlift - Description of the internal state:\n\n");
+      //log.println ("\nNumber of iterations = " + nIter + "\n");
+      log.println ("  PT    HT   P00   P01   P02   P03   P04   P05   P06   P07   P08   P09   P10   P11   P12   P13   P14   P15   P16   P17   P18   P19   P20   InQ  InF  PTAL");
+      log.flush();
+      reportStatus ();
+   }
 	   
-	   /**
-	    *  Write a state line at the end of the logging file.
-	    *
-	    *  The current state of the passengers, pilot and hostess is organized in a line to be printed.
-	    *  Internal operation.
-	    */	   
+   /**
+    *  Write a state line at the end of the logging file.
+    *
+    *  The current state of the passengers, pilot and hostess is organized in a line to be printed.
+    *  Internal operation.
+    */	   
 	private void reportStatus ()
 	{
 		int nPassQueue = 0;
@@ -219,34 +208,16 @@ public class GeneralRep
 		switch (hostessState)
 		{
 			case Hostess.States.CHECK_PASSENGER:
-//				hostess_last_state = Hostess.States.CHECK_PASSENGER;
 				lineStatus += " CKPS ";
 				break;
-			//-----------------------------------------------------------------------------	
 			case Hostess.States.READY_TO_FLY:
 				lineStatus += " RDTF ";
-
-//				for (int i = 0; i < Settings.nPassengers; i++)
-//					if (passengerState[i] == Passenger.States.IN_FLIGHT)
-//						nPassenger++;
-//
-//				if (Hostess.States.READY_TO_FLY != hostess_last_state)
-//				{
-//					hostess_last_state = Hostess.States.READY_TO_FLY;
-//					log.println ("\nFlight "+ flightId +": Departed with "+nPassenger+" passengers ");
-//				}
-//
-//				nPassenger = 0;
 				break;
-			//------------------------------------------------------------------------------	
 			case Hostess.States.WAIT_FOR_NEXT_FLIGHT: lineStatus += " WTFL ";
-//				hostess_last_state = Hostess.States.WAIT_FOR_NEXT_FLIGHT;
 				break;
 			case Hostess.States.WAIT_FOR_PASSENGER: lineStatus += " WTFP ";
-//				hostess_last_state = Hostess.States.WAIT_FOR_NEXT_FLIGHT;
 				break;
 		}
-
 
 		for (int i = 0; i < Settings.nPassengers; i++)
 			switch (passengerState[i])
@@ -273,7 +244,6 @@ public class GeneralRep
     /**
      *  Close the logging file
      */
-
     public void endReport(){
     	log.println("\nAirlift sum up:");
 		for (int i = 0; i < nPassFlight.length; i++) {

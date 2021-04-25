@@ -8,110 +8,110 @@ import java.util.LinkedList;
 
 public class DestinationAirport
 {
-
+    /**
+     * Reference to general repository
+     */
     private final GeneralRep generalRep;
 
-//    private boolean arrived;
-
+    /**
+     * Number of passengers
+     */
     private int nPassengers;
 
-    public int getTotalPassengers() {
-        return totalPassengers;
-    }
-
+    /**
+     * Number of total passengers
+     */
     private int totalPassengers;
     
-//    private Plane plane;
-    
+    /**
+     * Last passenger out flag
+     */   
     private boolean lastPassengerOut;
 
-    // testes ------------------
-
+    /**
+     * Arrived passengers list
+     */ 
     public LinkedList<Integer> arrivedPassengers = new LinkedList<>();
 
-    // testes ---------------
-
+    
+    /*                                 CONSTRUCTOR                                   */
+    /*-------------------------------------------------------------------------------*/ 
     /**
      *  Destination Airport instantiation.
      *
      *    @param repos reference to the general repository
      */
-
     public DestinationAirport(GeneralRep repos, Plane plane)
     {
         this.generalRep = repos;
-//        this.arrived = false;
         this.nPassengers = 0;
         totalPassengers = 0;
         this.lastPassengerOut = false;
-//        this.plane = plane;
     }
     
-//
-//    public boolean isArrived() {
-//		return this.arrived;
-//	}
-//
-//
-//	public void setArrived(boolean arrived) {
-//		this.arrived = arrived;
-//	}
-
-
-    //----------------------------------------
-    // Passageiro
-	
+    /**
+     * Get number of total passengers
+     */
+    public int getTotalPassengers() 
+    {
+        return totalPassengers;
+    }
+    
+    
+    /*                                 PASSENGER                                     */
+    /*-------------------------------------------------------------------------------*/ 
+   
+    /**
+     *  Operation of passenger leaving the plane
+     *
+     *  It is called by the PASSENGER when he leaves the plane
+     *
+     *
+     */     
 	public synchronized void leaveThePlane() {
 		int passId = ((Passenger) Thread.currentThread()).getpId();
 
-
-        // testes ------------------
-
         arrivedPassengers.add(passId);
-
-        // testes ---------------
-
-		System.out.println("PASSENGER " + passId + ": Left the plane");
-        
+		//System.out.println("PASSENGER " + passId + ": Left the plane");       
 		((Passenger) Thread.currentThread()).setpState(Passenger.States.AT_DESTINATION);
 		generalRep.setPassengerState(passId, Passenger.States.AT_DESTINATION);
         nPassengers--;
         totalPassengers++;
-//        try {
-//        	passId = plane.getPassengerSeats().read();
-//        } catch (MemException e) {}
-        
-//        System.out.println("    PASSENGER: " +passId+ " left the plane");
-        System.out.println(nPassengers);
-        if (nPassengers == 0) {
+        //System.out.println(nPassengers);
+        if (nPassengers == 0) 
+        {
             System.out.println("        PASSENGER : " + passId + " Was the last to left the plane, notify the pilot");
             notifyAll();
-        }
-
-            
+        }            
     }
 
 
-    //----------------------------------------
-    // Piloto
+    /*                                    PILOT                                      */
+    /*-------------------------------------------------------------------------------*/ 
 
+    /**
+     *  Operation inform that plane reached the destionation
+     *
+     *  It is called by the pilot when plane was landed
+     *
+     *
+     */ 
     public synchronized void announceArrival(int nPass) {
-        //this.arrived = true;
+
         nPassengers = nPass;
         
-        System.out.println("PILOT: Plane arrived at destination");
+        //System.out.println("PILOT: Plane arrived at destination");
         ((Pilot) Thread.currentThread()).setPilotState(Pilot.States.DEBOARDING);
         generalRep.writeLog("Arrived");
         generalRep.setPilotState(Pilot.States.DEBOARDING);
-
         
-        System.out.println("    [!] Set destinanion flag at TRUE");
-
+        //System.out.println("    [!] Set destinanion flag at TRUE");
         
         notifyAll();
         
-        System.out.println("PILOT: Waiting for all passengers to leave the plane");
-        while ( nPassengers != 0) {
+        //System.out.println("PILOT: Waiting for all passengers to leave the plane");
+        while ( nPassengers != 0) 
+        {
             try{          	
                 wait();
             }catch (InterruptedException e){}
@@ -121,8 +121,6 @@ public class DestinationAirport
         generalRep.writeLog("Returning");
         generalRep.setPilotState(Pilot.States.FLYING_BACK);
 
-
-        System.out.println("\n\n    [!] Set destinanion flag at FALSE");
-
+        //System.out.println("\n\n    [!] Set destinanion flag at FALSE");
     }
 }
