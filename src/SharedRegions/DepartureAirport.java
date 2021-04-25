@@ -6,6 +6,9 @@ import Main.*;
 
 import java.util.Arrays;
 
+/**
+ * Shared region : Departure Airport
+ */
 public class DepartureAirport
 {
     /**
@@ -18,7 +21,7 @@ public class DepartureAirport
      * References tio the passengers
      */
 
-    private Passenger passengers[];  // passenger objects
+    private final Passenger[] passengers;  // passenger objects
 
     /**
      * Ready for boarding flag
@@ -41,13 +44,13 @@ public class DepartureAirport
      * Show documents flags
      */
 
-    private boolean showDocuments[];
+    private final boolean[] showDocuments;
 
     /**
      * Allowed to board flags
      */
 
-    private boolean canBoard[];
+    private final boolean[] canBoard;
 
 
     /*                                  CONSTRUCTOR                                    */
@@ -120,7 +123,7 @@ public class DepartureAirport
             System.exit(1);
         }
         
-        System.out.println("HOSTESS: Passenger "+ passId +" is next on queue");
+//        System.out.println("HOSTESS: Passenger "+ passId +" is next on queue");
 
         showDocuments[passId] = true;
 
@@ -132,15 +135,15 @@ public class DepartureAirport
         
         while (showDocuments[passId])
         {
-        	System.out.println("HOSTESS: Checking passenger "+ passId +" documents");
+//        	System.out.println("HOSTESS: Checking passenger "+ passId +" documents");
             
         	try {
                 wait();
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException ignored) {}
         }
 
-        System.out.println("	HOSTESS: Passenger "+ passId +" documents checked!");
-        System.out.println("		HOSTESS: Passenger "+ passId +" allowed to board");
+//        System.out.println("	HOSTESS: Passenger "+ passId +" documents checked!");
+//        System.out.println("		HOSTESS: Passenger "+ passId +" allowed to board");
 
         canBoard[passId] = true;
 
@@ -157,17 +160,17 @@ public class DepartureAirport
      */
     public synchronized void waitForNextPassenger() 
     {
-    	System.out.println("HOSTESS: Checking if queue not empty");
+//    	System.out.println("HOSTESS: Checking if queue not empty");
         ((Hostess) Thread.currentThread()).sethState(Hostess.States.WAIT_FOR_PASSENGER);
         generalRep.setHostess(Hostess.States.WAIT_FOR_PASSENGER);
         
         while (passengerQueue.empty()) 
         {
-        	System.out.println("HOSTESS: Waiting for next passenger");
+//        	System.out.println("HOSTESS: Waiting for next passenger");
             
         	try {
             	wait();
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException ignored) {}
         }
     }
 
@@ -180,14 +183,14 @@ public class DepartureAirport
      */
     public synchronized void waitForNextFlight() 
     {
-        System.out.println("HOSTESS: Waiting for next flight");
+//        System.out.println("HOSTESS: Waiting for next flight");
         ((Hostess) Thread.currentThread()).sethState(Hostess.States.WAIT_FOR_NEXT_FLIGHT);
         generalRep.setHostess(Hostess.States.WAIT_FOR_NEXT_FLIGHT);
         while (!readyForBoardig) 
         {
             try {
                 wait();
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException ignored) {}
         }
         readyForBoardig = false;
         nPassengers = 0;
@@ -215,8 +218,8 @@ public class DepartureAirport
         passengers[passId] = (Passenger) Thread.currentThread();
         passengers[passId].setpState(Passenger.States.IN_QUEUE);
         generalRep.setPassengerState(passId,Passenger.States.IN_QUEUE);
-        System.out.println("[!] PASSENGER " + passId + ": Arrived at departure airport");
-        //TODO: repository
+//        System.out.println("[!] PASSENGER " + passId + ": Arrived at departure airport");
+
 
         try {
             passengerQueue.write(passId);
@@ -229,7 +232,7 @@ public class DepartureAirport
         while (!showDocuments[passId]){
             try{
                 wait();
-            }catch (InterruptedException e){
+            }catch (InterruptedException ignored){
 
             }
         }
@@ -239,7 +242,7 @@ public class DepartureAirport
         while (!canBoard[passId]){
             try{
                 wait();
-            }catch (InterruptedException e){
+            }catch (InterruptedException ignored){
 
             }
         }
@@ -258,7 +261,7 @@ public class DepartureAirport
 
         int passId = ((Passenger)Thread.currentThread()).getpId();
         showDocuments[passId] = false;
-        System.out.println("PASSENGER "+ passId +": Shows documents");
+//        System.out.println("PASSENGER "+ passId +": Shows documents");
         notifyAll();
     }
     
@@ -281,7 +284,7 @@ public class DepartureAirport
         ((Pilot) Thread.currentThread()).setPilotState(Pilot.States.READY_FOR_BOARDING);
         generalRep.setPilotState(Pilot.States.READY_FOR_BOARDING);
 
-        System.out.println("PILOT: Plane is ready for boarding");
+//        System.out.println("PILOT: Plane is ready for boarding");
         notifyAll();
     }
 
@@ -292,7 +295,7 @@ public class DepartureAirport
     public void parkAtTransferGate() {
         ((Pilot) Thread.currentThread()).setPilotState(Pilot.States.AT_TRANSFER_GATE);
         generalRep.setPilotState(Pilot.States.AT_TRANSFER_GATE);
-        System.out.println("PILOT: Park transfer gate");
+//        System.out.println("PILOT: Park transfer gate");
 
     }
 }

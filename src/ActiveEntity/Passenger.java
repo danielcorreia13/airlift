@@ -74,7 +74,7 @@ public class Passenger extends Thread
     /**
      *  Operation to set the passenger state
      *
-     *
+     * @param state new state
      */   
     public void setpState(int state){
         pState = state;
@@ -117,7 +117,7 @@ public class Passenger extends Thread
         try
         { sleep ((long) (1 + 250 * Math.random ()));
         }
-        catch (InterruptedException e) {}
+        catch (InterruptedException ignored) {}
     }
     
   
@@ -125,7 +125,7 @@ public class Passenger extends Thread
      *    Definition of the internal states of the passenger during his life cycle.
      */
 
-    public final class States{
+    public static final class States{
 
         /**
          *   The customer takes the bus to go to the departure airport.

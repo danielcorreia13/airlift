@@ -2,10 +2,11 @@ package SharedRegions;
 
 import ActiveEntity.Passenger;
 import ActiveEntity.Pilot;
-import myLib.MemException;
 
-import java.util.LinkedList;
 
+/**
+ * Shared region : Destination Airport
+ */
 public class DestinationAirport
 {
     /**
@@ -22,16 +23,7 @@ public class DestinationAirport
      * Number of total passengers
      */
     private int totalPassengers;
-    
-    /**
-     * Last passenger out flag
-     */   
-    private boolean lastPassengerOut;
 
-    /**
-     * Arrived passengers list
-     */ 
-    public LinkedList<Integer> arrivedPassengers = new LinkedList<>();
 
     
     /*                                 CONSTRUCTOR                                   */
@@ -41,16 +33,17 @@ public class DestinationAirport
      *
      *    @param repos reference to the general repository
      */
-    public DestinationAirport(GeneralRep repos, Plane plane)
+    public DestinationAirport(GeneralRep repos)
     {
         this.generalRep = repos;
         this.nPassengers = 0;
         totalPassengers = 0;
-        this.lastPassengerOut = false;
     }
     
     /**
-     * Get number of total passengers
+     * Get number of total transported passengers
+     *
+     * @return number of total transported passengers
      */
     public int getTotalPassengers() 
     {
@@ -71,7 +64,6 @@ public class DestinationAirport
 	public synchronized void leaveThePlane() {
 		int passId = ((Passenger) Thread.currentThread()).getpId();
 
-        arrivedPassengers.add(passId);
 		//System.out.println("PASSENGER " + passId + ": Left the plane");       
 		((Passenger) Thread.currentThread()).setpState(Passenger.States.AT_DESTINATION);
 		generalRep.setPassengerState(passId, Passenger.States.AT_DESTINATION);
@@ -80,7 +72,7 @@ public class DestinationAirport
         //System.out.println(nPassengers);
         if (nPassengers == 0) 
         {
-            System.out.println("        PASSENGER : " + passId + " Was the last to left the plane, notify the pilot");
+//            System.out.println("        PASSENGER : " + passId + " Was the last to left the plane, notify the pilot");
             notifyAll();
         }            
     }
@@ -94,7 +86,7 @@ public class DestinationAirport
      *
      *  It is called by the pilot when plane was landed
      *
-     *
+     *  @param nPass number of passengers in the plane
      */ 
     public synchronized void announceArrival(int nPass) {
 
@@ -114,7 +106,7 @@ public class DestinationAirport
         {
             try{          	
                 wait();
-            }catch (InterruptedException e){}
+            }catch (InterruptedException ignored){}
         }
 
         ((Pilot) Thread.currentThread()).setPilotState(Pilot.States.FLYING_BACK);

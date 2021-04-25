@@ -3,7 +3,9 @@ package Main;
 import SharedRegions.*;
 import ActiveEntity.*;
 
-
+/**
+ * Main class for the simulation
+ */
 public class AirLift
 {
 
@@ -49,11 +51,11 @@ public class AirLift
 	public AirLift()
 	{
 		generalRep = new GeneralRep("LOG_FILE.txt");
-		
-		sharedDepartureAirport = new DepartureAirport(generalRep);		
+
+		sharedDepartureAirport = new DepartureAirport(generalRep);
 		sharedPlane = new Plane(generalRep);
-		sharedDestinationAirport = new DestinationAirport(generalRep, sharedPlane);
-		
+		sharedDestinationAirport = new DestinationAirport(generalRep);
+
 		// Instanciar as entidades ativas (Threads) - Para j� s�o passadas as interfaces que cada um usa.
 		pilot = new Pilot("Pilot1", sharedDepartureAirport, sharedDestinationAirport, sharedPlane /* Passar mais argumentos*/ );
 		hostess = new Hostess( "Hostess1", sharedDepartureAirport, sharedPlane /* Passar mais argumentos*/);
@@ -98,10 +100,10 @@ public class AirLift
 
 	/**
 	 * Main function
-	 *
+	 * @param args No arguments required
 	 */
 	
-	public static void main(String args[])
+	public static void main(String[] args)
 	{
 		new AirLift ().startSimulation();
 	}

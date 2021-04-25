@@ -81,15 +81,15 @@ public class Hostess extends Thread
             int min = Settings.minPassengers;
             while (true) {
                 if(depAir.getnPassengers() == max) {
-                    System.out.println("HOSTESS: Plane full, informing pilot");
+//                    System.out.println("HOSTESS: Plane full, informing pilot");
                     break;
                 }
                 if(depAir.empty() && depAir.getnPassengers() > min){
-                    System.out.println("HOSTESS: No passengers waiting, informing pilot");
+//                    System.out.println("HOSTESS: No passengers waiting, informing pilot");
                     break;
                 }
                 if(count == Settings.nPassengers){
-                    System.out.println("HOSTESS: Last passenger boarding, informing pilot");
+//                    System.out.println("HOSTESS: Last passenger boarding, informing pilot");
                     break;
                 }
                 count++;
@@ -107,11 +107,11 @@ public class Hostess extends Thread
      */
 
     public void prepareForPassBoarding() {
-    	System.out.println("HOSTESS: Preparing for pass board");
+//    	System.out.println("HOSTESS: Preparing for pass board");
         try
         { sleep ((long) (1 + 10 * Math.random ()));
         }
-        catch (InterruptedException e) {}
+        catch (InterruptedException ignored) {}
         
 
     }
@@ -120,7 +120,7 @@ public class Hostess extends Thread
      *    Definition of the internal states of the hostess during his life cycle.
      */
 
-    public final class States{
+    public static final class States{
 
         /**
          *   The hostess waits for the next flight.

@@ -3,12 +3,10 @@ package SharedRegions;
 import ActiveEntity.Hostess;
 import ActiveEntity.Passenger;
 import ActiveEntity.Pilot;
-import SharedRegions.DestinationAirport;
-import Main.Settings;
-import myLib.MemException;
-import myLib.MemFIFO;
-import myLib.MemObject;
 
+/**
+ * Shared region : Plane
+ */
 public class Plane
 {	
     /**
@@ -47,30 +45,6 @@ public class Plane
         this.nPassengers = 0;
     }
 
-    /**
-     * Get number of passengers
-     */
-    public int getNPassengers()
-    {
-        return this.nPassengers;
-    }
-    
-    /**
-     * Decrement number of passengers when they leave at destination
-     */   
-    public void passengerLeave()
-    {
-        this.nPassengers--;
-    }
-    
-    /**
-     * Increment number of passengers when they departure at destination
-     */    
-    public void passengerBoard() 
-    {
-    	this.nPassengers++;
-    }
-
     /*                                  HOSTESS                                      */
     /*-------------------------------------------------------------------------------*/
     
@@ -81,14 +55,14 @@ public class Plane
      *	Requiring minimum passengers on board and departure queue is empty
      *  Or if maximum passengers on board was reached
      *  Or if number of passengers on board is between min and max, and departure queue is empty
-     *  
+     * @param nPass number of passengers that boarded the plane
      */    
     public synchronized void informPlaneIsReadyToTakeOff(int nPass)
     {
         while (nPassengers != nPass){
             try{
                 wait();
-            }catch (InterruptedException e){}
+            }catch (InterruptedException ignored){}
         }
 
     	allInBoard = true;
@@ -107,6 +81,8 @@ public class Plane
      *  Operation to set plane at destination
      *
      * It is called by pilot on destination point
+     *
+     * @param atDestination new value
      */    
 	public synchronized void setAtDestination(boolean atDestination)
     {
@@ -119,7 +95,7 @@ public class Plane
      *
      *  It is called by the pilot to notify passengers that the plane was landed
      *
-     *
+     * @return true if at destination
      */ 
     public synchronized boolean isAtDestination()
     {
@@ -139,20 +115,27 @@ public class Plane
     public synchronized void waitForEndOfFlight() 
     {
     	
-    	int passId = ((Passenger) Thread.currentThread()).getpId();
+//    	int passId = ((Passenger) Thread.currentThread()).getpId();
     	//System.out.println("[!] PASSENGER "+ passId +": Waiting for the end of the flight");
     		
     	while ( !isAtDestination() )
     	{
     		try {
     			wait();
-    		} catch (InterruptedException e) {}
+    		} catch (InterruptedException ignored) {}
     	}
     	    	
     	notifyAll();
     	    	
     }
-    
+
+    /**
+     *  Operation inform that the passenger as entered the plane
+     *
+     *  It is called by the PASSENGER when enters the plane
+     *
+     *
+     */
     public synchronized void boardThePlane()
     {
 
@@ -187,7 +170,7 @@ public class Plane
             while( !allInBoard)
     			wait();
     	}
-    	catch (InterruptedException e) {}
+    	catch (InterruptedException ignored) {}
     	allInBoard = false;
         ((Pilot) Thread.currentThread()).setPilotState(Pilot.States.FLYING_FORWARD);
 

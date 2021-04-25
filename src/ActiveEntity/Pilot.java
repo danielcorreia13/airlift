@@ -88,7 +88,7 @@ public class Pilot extends Thread
 
             flyToDeparturePoint();
 
-            System.out.println("\n");
+//            System.out.println("\n");
         }while (destAir.getTotalPassengers() != Settings.nPassengers);
         depAir.parkAtTransferGate();
     }
@@ -104,13 +104,13 @@ public class Pilot extends Thread
     public synchronized void flyToDestinationPoint()
     {
     	
-        System.out.println("\nPILOT: Flying to destination");
-        System.out.println("=================================\n");
+//        System.out.println("\nPILOT: Flying to destination");
+//        System.out.println("=================================\n");
         try
         {
             sleep ((long) (1 + 100 * Math.random ()));
         }
-        catch (InterruptedException e) {}
+        catch (InterruptedException ignored) {}
     }
 
     /**
@@ -122,22 +122,22 @@ public class Pilot extends Thread
      */
 
     public synchronized void flyToDeparturePoint() {
-        System.out.println("\nPILOT: Flying back to departure");
-        System.out.println("=================================\n");
+//        System.out.println("\nPILOT: Flying back to departure");
+//        System.out.println("=================================\n");
 
         notifyAll();
         try
         {
             sleep ((long) (1 + 100 * Math.random ()));
         }
-        catch (InterruptedException e) {}
+        catch (InterruptedException ignored) {}
     }
 
     /**
      *    Definition of the internal states of the pilot during his life cycle.
      */
 
-    public final class States{
+    public static final class States{
 
         /**
          *   The plane is at transfer gate.
