@@ -13,7 +13,11 @@ public class DepartureAirport
      */
     private MemFIFO<Integer> passengerQueue;  // passengers waiting to check documents
 
-    // Maybe not necessary
+
+    /**
+     * References tio the passengers
+     */
+
     private Passenger passengers[];  // passenger objects
 
     /**
@@ -77,10 +81,20 @@ public class DepartureAirport
         nPassengers = 0;
     }
 
+    /**
+     *
+     * @return true if the passenger queue is empty
+     */
+
     public boolean empty(){
         return passengerQueue.empty();
     }
-    
+
+    /**
+     *
+     * @return the number of passengers that have been checked
+     */
+
     public int getnPassengers() {
         return nPassengers;
     }
@@ -93,7 +107,7 @@ public class DepartureAirport
      *
      *  It is called by the HOSTESS when she is requesting a passenger documents
      *
-     *    @return void
+     *
      */
     public synchronized void checkDocuments() 
     {
@@ -139,12 +153,11 @@ public class DepartureAirport
      *
      *  It is called by the HOSTESS when she is waiting for a passenger on the queue
      *
-     *    @return void
+     *
      */
     public synchronized void waitForNextPassenger() 
     {
     	System.out.println("HOSTESS: Checking if queue not empty");
-//        notifyAll();
         ((Hostess) Thread.currentThread()).sethState(Hostess.States.WAIT_FOR_PASSENGER);
         generalRep.setHostess(Hostess.States.WAIT_FOR_PASSENGER);
         
@@ -163,7 +176,7 @@ public class DepartureAirport
      *
      *  It is called by the PASSENGER when he is on flight waiting to reach the destination
      *
-     *    @return void
+     *
      */
     public synchronized void waitForNextFlight() 
     {
@@ -194,7 +207,7 @@ public class DepartureAirport
      *
      *  It is called by the PASSENGER when he is on the queue
      *
-     *    @return void
+     *
      */
     public synchronized void waitInQueue() 
     {
@@ -238,7 +251,7 @@ public class DepartureAirport
      *
      *  It is called by the PASSENGER when he need to show his documents to the hostess
      *
-     *    @return void
+     *
      */
     public synchronized void showDocuments() 
     {
@@ -258,7 +271,7 @@ public class DepartureAirport
      *
      *  It is called by the PILOT when plane is parked on departure and ready for boarding
      *
-     *    @return void
+     *
      */
     public synchronized void informPlaneReadyForBoarding() 
     {
@@ -271,6 +284,10 @@ public class DepartureAirport
         System.out.println("PILOT: Plane is ready for boarding");
         notifyAll();
     }
+
+    /**
+     * It's called by the pilot to park the plane at the transfer gate
+     */
 
     public void parkAtTransferGate() {
         ((Pilot) Thread.currentThread()).setPilotState(Pilot.States.AT_TRANSFER_GATE);

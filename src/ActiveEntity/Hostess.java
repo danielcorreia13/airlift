@@ -12,7 +12,6 @@ import SharedRegions.*;
 
 public class Hostess extends Thread
 {
-    // Para os métodos que só a Hospedeira tem acesso nas zonas partilhadas.
 
     /**
      *  Reference to Departure Airport
@@ -26,20 +25,20 @@ public class Hostess extends Thread
 
     private final Plane plane;
 
-    public int gethState() {
-        return hState;
-    }
-
-    public void sethState(int hState) {
-        this.hState = hState;
-
-    }
 
     /**
      *  Hostess state
      */
 
     private int hState;
+
+    /**
+     * Hostess constructor
+     * Creates a Hostess thread and initializes it's parameters
+     * @param name name of the thread
+     * @param depAir Reference to Departure Airport
+     * @param plane Reference to Plane
+     */
 
     public Hostess(String name, DepartureAirport depAir, Plane plane) {
         super(name);
@@ -48,10 +47,31 @@ public class Hostess extends Thread
         this.hState = States.WAIT_FOR_NEXT_FLIGHT;
     }
 
-    //Vida do Thread (Hospedeira)
+    /**
+     * Get Hostess state
+     * @return hostess current state
+     */
+
+    public int gethState() {
+        return hState;
+    }
+
+    /**
+     * Ste Hostess state
+     * @param hState new state
+     */
+
+    public void sethState(int hState) {
+        this.hState = hState;
+
+    }
+
+    /**
+     * Main loop of the hostess that runs it's life cycle
+     */
+
     public void run()
     {
-        Boolean notEnd = true;
         int count = 0;
         do {
             depAir.waitForNextFlight();
@@ -79,6 +99,12 @@ public class Hostess extends Thread
             plane.informPlaneIsReadyToTakeOff(depAir.getnPassengers());
         }while (count < Settings.nPassengers);
     }
+
+    /**
+     * Hostess prepares for pass boarding
+     *
+     * The thread is put to sleep for a random amount of time
+     */
 
     public void prepareForPassBoarding() {
     	System.out.println("HOSTESS: Preparing for pass board");

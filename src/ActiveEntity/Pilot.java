@@ -32,7 +32,14 @@ public class Pilot extends Thread
      */
     private int pilotState;
 
-    
+    /**
+     * Pilots constructor
+     * Creates a Pilot thread and initializes it's parameters
+     * @param name name of the thread
+     * @param depAir Reference to Departure Airport
+     * @param destAir Reference to Destination Airport
+     * @param plane Reference to Plane
+     */
     
     public Pilot(String name, DepartureAirport depAir, DestinationAirport destAir, Plane plane) {
         super(name);
@@ -41,23 +48,33 @@ public class Pilot extends Thread
         this.plane = plane;
         this.pilotState = States.AT_TRANSFER_GATE;
     }
- 
+
+    /**
+     * Get the pilot's state
+     * @return pilot's current state
+     */
     
     public int getPilotState()
     {
 		return this.pilotState;
 	}
+
+    /**
+     * Set the pilot state
+     * @param pState new state
+     */
     
     public void setPilotState(int pState)
     {
 		this.pilotState = pState;
 	}
-    
 
-	// Vida do Thread (Piloto)
+    /**
+     * Main loop of the pilot that runs it's life cycle
+     */
+
     public void run()
     {
-        Boolean notEnd = true;
         
         do {
             depAir.parkAtTransferGate();
@@ -71,32 +88,17 @@ public class Pilot extends Thread
 
             flyToDeparturePoint();
 
-//            System.out.println("\n\tTransported passengers so far (" + destAir.arrivedPassengers.size() +"): ");
-//            for (Integer id : destAir.arrivedPassengers){
-//                System.out.println(id);
-//            }
             System.out.println("\n");
         }while (destAir.getTotalPassengers() != Settings.nPassengers);
-
+        depAir.parkAtTransferGate();
     }
 
-//    public void parkAtTransferGate() {
-//        this.pilotState = States.AT_TRANSFER_GATE;
-//        System.out.println("PILOT: Park transfer gate");
-//        try
-//        {
-//        	sleep ((long) (1 + 100 * Math.random ()));
-//        }
-//        catch (InterruptedException e) {}
-//
-//    }
-
     /**
-     *  Operation inform that the plane is going to the destination point
+     *  Operation fly to the destination point
      *
-     *  It is called by the PILOT while flying to destination point
+     *  Puts the thread a sleep for a random amount of time
      *
-     *    @return void
+     *
      */
 
     public synchronized void flyToDestinationPoint()
@@ -112,11 +114,11 @@ public class Pilot extends Thread
     }
 
     /**
-     *  Operation inform that the plane is ready for take off
+     *  Operation fly to the departure point
      *
-     *  It is called by the PILOT while flying to departure point
+     *  Puts the thread a sleep for a random amount of time
      *
-     *    @return void
+     *
      */
 
     public synchronized void flyToDeparturePoint() {

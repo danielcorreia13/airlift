@@ -93,7 +93,7 @@ public class Plane
      *
      *  It is called by the HOSTESS when all passengers are on board, requiring the minimum capacity of the plane
      *
-     *    @return void
+     *
      */
     
     public synchronized void informPlaneIsReadyToTakeOff(int nPass)
@@ -152,7 +152,7 @@ public class Plane
      *
      *  It is called by the PASSENGER when he is on the plane
      *
-     *    @return void
+     *
      */
     
     public synchronized void waitForEndOfFlight() 

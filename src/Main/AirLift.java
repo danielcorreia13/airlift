@@ -6,22 +6,48 @@ import ActiveEntity.*;
 
 public class AirLift
 {
-	// Regi�es partilhadas
+
+	/**
+	 *  Reference to Departure Airport
+	 */
 	private final DepartureAirport sharedDepartureAirport;
+
+	/**
+	 *  Reference to Destination Airport
+	 */
 	private final DestinationAirport sharedDestinationAirport;
+
+	/**
+	 *  Reference to Plane
+	 */
 	private final Plane sharedPlane;
+
+	/**
+	 *  Reference to the general repository of information
+	 */
 	private final GeneralRep generalRep;
-	
-	// Entidades ativas
-	private final Hostess hostess;	
+
+	/**
+	 *  Reference to Hostess
+	 */
+	private final Hostess hostess;
+
+	/**
+	 *  Reference to Pilot
+	 */
 	private final Pilot pilot;
+
+	/**
+	 *  References to Passengers
+	 */
 	private final Passenger[] passenger;
 
-	
-	public AirLift( String args[] )
+	/**
+	 * Constructor
+	 * Initializes all the shared regions and entities for the simulation
+	 */
+	public AirLift()
 	{
-		
-		// Instanciar as regi�es partilhadas
 		generalRep = new GeneralRep("LOG_FILE.txt");
 		
 		sharedDepartureAirport = new DepartureAirport(generalRep);		
@@ -41,8 +67,11 @@ public class AirLift
 		}
 		
 	}
-	
-	// Iniciar a simula��o
+
+	/**
+	 * Runs the simulation
+	 * Launches the threads and waits for them to finish
+	 */
 	public void startSimulation()
 	{
 		System.out.println("Simulacao iniciada\n\n");
@@ -53,27 +82,27 @@ public class AirLift
 			p.start();
 		}
 
-		
-		
-		// Esperar que os threads morram
 		try {
-			pilot.join();
 			hostess.join();
 			for (Passenger p : passenger) {
 				p.join();
 			}
+			pilot.join();
 		}catch (InterruptedException e){
-			System.out.println("Morreuuuuu");
+			System.out.println("Something went wrong");
 		}
 		generalRep.endReport();
 
 	}
-	
-	
-	
+
+
+	/**
+	 * Main function
+	 *
+	 */
 	
 	public static void main(String args[])
 	{
-		new AirLift ( args ).startSimulation();
+		new AirLift ().startSimulation();
 	}
 }

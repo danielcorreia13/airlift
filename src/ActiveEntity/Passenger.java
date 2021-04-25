@@ -74,7 +74,7 @@ public class Passenger extends Thread
     /**
      *  Operation to set the passenger state
      *
-     *    @return void
+     *
      */   
     public void setpState(int state){
         pState = state;
@@ -111,7 +111,7 @@ public class Passenger extends Thread
     /**
      *  Going to airport.
      *
-     *  Internal operation.
+     *  Puts the thread a sleep for a random amount of time
      */
     public void travelToAirport() {
         try
