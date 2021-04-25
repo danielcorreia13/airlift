@@ -45,6 +45,8 @@ public class GeneralRep
 	 */
 
 	private int flightId;
+	
+	 int nPassenger;
 
 //	/**
 //	 *  Number of passengers in queue
@@ -63,7 +65,7 @@ public class GeneralRep
 //	 */
 //
 //	private int nPassArrived;
-
+	 private int hostess_last_state;
 
 
 	/**
@@ -91,6 +93,9 @@ public class GeneralRep
 	      hostessState = Hostess.States.WAIT_FOR_NEXT_FLIGHT;
 	      pilotState = Pilot.States.AT_TRANSFER_GATE;
 	      flightId = 0;
+	      nPassenger = 0;
+	      this.hostess_last_state = 100;
+
 	      reportInitialStatus ();
 	   }
 	   
@@ -106,8 +111,14 @@ public class GeneralRep
 	    */
 	    public synchronized void setPassengerState (int id, int state)
 	    {
-	       passengerState[id] = state;
-	       reportStatus ();
+	    	
+	    	if (passengerState[id] != state) 
+	    	{
+		    	passengerState[id] = state;
+		    	reportStatus ();
+	    	}
+	    	else	    		
+	    		return;
 	    }
 
 	   /**
@@ -118,18 +129,28 @@ public class GeneralRep
 	    */
 	    public synchronized void setPilotState (int state)
 	    {
-	       pilotState = state;
-	       reportStatus ();
+	    	if (pilotState != state)
+	    	{
+	    		pilotState = state;
+	    		reportStatus ();
+	    	}
+	    	else
+	    		return;
 	    }
 	    
 	    public synchronized void setHostess (int state)
 	    {
-	       hostessState = state;
-	       reportStatus ();
+	    	if (hostessState != state)
+	    	{
+	    		hostessState = state;
+	    		reportStatus ();
+	    	}
+	    	else	    		
+	    		return;
 	    }
 
 	    public synchronized void nextFlight(){
-	    	flightId++;
+	    		flightId++;
 		}
 
 		public synchronized void writeLog(String msg){
@@ -149,9 +170,9 @@ public class GeneralRep
 	   private void reportInitialStatus ()
 	   {
 
-	      log.println ("                Problem of the Airlift");
+	      log.println ("\n\tAirlift - Description of the internal state:\n\n");
 	      //log.println ("\nNumber of iterations = " + nIter + "\n");
-	      log.println ("   PT   HT   P00   P01   P02   P03   P04   P05   P06   P07   P08   P09   P10   P11   P12   P13   P14   P15   P16   P17   P18   P19   P20  inQu inF PTAL");
+	      log.println ("  PT    HT   P00   P01   P02   P03   P04   P05   P06   P07   P08   P09   P10   P11   P12   P13   P14   P15   P16   P17   P18   P19   P20   InQ  InF  PTAL");
 	      log.flush();
 	      reportStatus ();
 	   }
@@ -164,7 +185,10 @@ public class GeneralRep
 	    */	   
 	private void reportStatus ()
 	{
-
+		int nPassQueue = 0;
+		int nPassPlane = 0;
+		int nPassArrived = 0;
+		
 		String lineStatus = "";                              // state line to be printed
 
 		switch (pilotState)
@@ -185,19 +209,36 @@ public class GeneralRep
 
 		switch (hostessState)
 		{
-			case Hostess.States.CHECK_PASSENGER:  lineStatus += " CKPS ";
+			case Hostess.States.CHECK_PASSENGER:
+				hostess_last_state = Hostess.States.CHECK_PASSENGER;
+				lineStatus += " CKPS ";
 				break;
-			case Hostess.States.READY_TO_FLY: lineStatus += " RDTF ";
+			//-----------------------------------------------------------------------------	
+			case Hostess.States.READY_TO_FLY:
+				lineStatus += " RDTF ";
+
+				for (int i = 0; i < Settings.nPassengers; i++)
+					if (passengerState[i] == Passenger.States.IN_FLIGHT)
+						nPassenger++;
+				
+				if (Hostess.States.READY_TO_FLY != hostess_last_state)	
+				{
+					hostess_last_state = Hostess.States.READY_TO_FLY;
+					log.println ("\nFlight "+ flightId +": Departed with "+nPassenger+" passengers ");
+				}
+				
+				nPassenger = 0;
 				break;
-			case Hostess.States.WAIT_FOR_NEXT_FLIGHT: lineStatus += " WFNF ";
+			//------------------------------------------------------------------------------	
+			case Hostess.States.WAIT_FOR_NEXT_FLIGHT: lineStatus += " WTFL ";
+				hostess_last_state = Hostess.States.WAIT_FOR_NEXT_FLIGHT;
 				break;
 			case Hostess.States.WAIT_FOR_PASSENGER: lineStatus += " WTFP ";
+				hostess_last_state = Hostess.States.WAIT_FOR_NEXT_FLIGHT;
 				break;
 		}
 
-		int nPassQueue = 0;
-		int nPassPlane = 0;
-		int nPassArrived = 0;
+
 		for (int i = 0; i < Settings.nPassengers; i++)
 			switch (passengerState[i])
 			{

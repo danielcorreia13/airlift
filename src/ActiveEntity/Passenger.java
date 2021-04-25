@@ -11,8 +11,6 @@ import SharedRegions.*;
 
 public class Passenger extends Thread
 {
-    // Para os métodos que só o Passageiro tem acesso nas zonas partilhadas.
-
     /**
      *  Reference to Departure Airport
      */
@@ -24,38 +22,13 @@ public class Passenger extends Thread
      */
 
     private final DestinationAirport destAir;
-
-    public int getpState() {
-        return pState;
-    }
-    public void setpState(int state){
-        pState = state;
-    }
-
-    public int getpId() {
-        return pId;
-    }
-
+    
     /**
      *  Reference to Plane
      */
 
     private final Plane plane;
-
-    /**
-     *  Passenger state
-     */
-
-    private int pState;
-
-    public boolean getShowDocuments() {
-        return showDocuments;
-    }
-
-    public void setShowDocuments(boolean showDocuments) {
-        this.showDocuments = showDocuments;
-    }
-
+      
     /**
      * Show documents flag
      */
@@ -67,8 +40,15 @@ public class Passenger extends Thread
      */
 
     private final int pId;
+    
 
+    /**
+     *  Passenger state
+     */
 
+    private int pState;
+    
+    
     /**
      *   Instantiation of a Passenger thread.
      *
@@ -78,8 +58,6 @@ public class Passenger extends Thread
      *     @param destAir reference to the Destination Airport
      *     @param plane reference to the Plane
      */
-
-
     public Passenger(String name, int id, DepartureAirport depAir, DestinationAirport destAir, Plane plane) {
         super(name);
         this.depAir = depAir;
@@ -88,6 +66,55 @@ public class Passenger extends Thread
         this.pState = States.GOING_TO_AIRPORT;
         this.pId = id;
         this.showDocuments = false;
+    }
+    
+    /**
+     *  Operation to show passenger documents
+     *
+     *  It is used when hostess request passenger documents
+     *
+     *    @return boolean
+     */   
+    public boolean getShowDocuments() {
+        return showDocuments;
+    }
+
+    /**
+     *  Operation to set passenger documents
+     *
+     *  It is used when hostess checked the passenger documents
+     *
+     *    @return void
+     */ 
+    public void setShowDocuments(boolean showDocuments) {
+        this.showDocuments = showDocuments;
+    }
+    
+    /**
+     *  Operation to get the passenger state
+     *
+     *    @return int
+     */   
+    public int getpState() {
+        return pState;
+    }
+    
+    /**
+     *  Operation to set the passenger state
+     *
+     *    @return void
+     */   
+    public void setpState(int state){
+        pState = state;
+    }
+
+    /**
+     *  Operation to get the passenger identification
+     *
+     *    @return int
+     */ 
+    public int getpId() {
+        return pId;
     }
 
     /**
@@ -108,7 +135,12 @@ public class Passenger extends Thread
         destAir.leaveThePlane();
 
     }
-
+   
+    /**
+     *  Going to airport.
+     *
+     *  Internal operation.
+     */
     public void travelToAirport() {
         try
         { sleep ((long) (1 + 250 * Math.random ()));
@@ -116,9 +148,7 @@ public class Passenger extends Thread
         catch (InterruptedException e) {}
     }
     
-    
-
-
+  
     /**
      *    Definition of the internal states of the passenger during his life cycle.
      */

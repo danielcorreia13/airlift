@@ -21,9 +21,6 @@ public class DepartureAirport
      */
     private boolean readyForBoardig;
 
-    public int getnPassengers() {
-        return nPassengers;
-    }
 
     /**
      * Keeps track of how many passengers are entering the plane
@@ -66,6 +63,10 @@ public class DepartureAirport
 
     public boolean empty(){
         return passengerQueue.empty();
+    }
+    
+    public int getnPassengers() {
+        return nPassengers;
     }
 
     /*                                   HOSTESS                                       */
@@ -111,6 +112,7 @@ public class DepartureAirport
         System.out.println("		HOSTESS: Passenger "+ passId +" allowed to board");
         passengers[passId].setpState(Passenger.States.IN_FLIGHT);
         generalRep.setPassengerState(passId, Passenger.States.IN_FLIGHT);
+        nPassengers++;
         notifyAll();
     }
 
@@ -210,7 +212,7 @@ public class DepartureAirport
 
             }
         }
-        nPassengers++;
+        //nPassengers++;
     }
 
     /**

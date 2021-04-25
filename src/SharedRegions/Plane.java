@@ -75,6 +75,9 @@ public class Plane
     public void passengerLeave(){
         this.nPassengers--;
     }
+    public void passengerBoard() {
+    	this.nPassengers++;
+    }
 
     /*                                  HOSTESS                                      */
     /*-------------------------------------------------------------------------------*/
@@ -97,10 +100,11 @@ public class Plane
 //    		}
 //    	System.out.println("[??] Aviao cheio -> " +passengerSeats.full());
     	allInBoard = true;
+
         ((Hostess) Thread.currentThread()).sethState(Hostess.States.READY_TO_FLY);
-        generalRep.setHostess(Hostess.States.READY_TO_FLY);
-        
+        generalRep.setHostess(Hostess.States.READY_TO_FLY);        
         System.out.println("HOSTESS->PILOT: Plane is ready for takeoff");
+        
         notifyAll();
 
     }
@@ -165,12 +169,13 @@ public class Plane
 //            System.exit(1);
 //        }
         
-        ((Passenger) Thread.currentThread()).setpState(Passenger.States.IN_FLIGHT);
-        generalRep.setPassengerState(passId, Passenger.States.IN_FLIGHT);
-        
+        //((Passenger) Thread.currentThread()).setpState(Passenger.States.IN_FLIGHT);
+        //generalRep.setPassengerState(passId, Passenger.States.IN_FLIGHT);
+    	
+    	passengerBoard();
         notifyAll();
         
-        nPassengers++;
+        
         
         System.out.println("PASSENGER "+passId+ ": Seated on plane");
 
@@ -204,7 +209,7 @@ public class Plane
     	allInBoard = false;
         ((Pilot) Thread.currentThread()).setPilotState(Pilot.States.FLYING_FORWARD);
 
-        generalRep.writeLog("Departed with " + nPassengers + " passengers");
+        //generalRep.writeLog("Departed with " + nPassengers + " passengers");
         generalRep.setPilotState(Pilot.States.FLYING_FORWARD);
     	
     }
